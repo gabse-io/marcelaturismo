@@ -3,272 +3,563 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Marcela Correa Turismo</title>
+    <title>Admin Visual | Editor de Sitio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0f172a; padding: 40px; }
-        .admin-container { max-width: 1400px; margin: 0 auto; }
-        .admin-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 24px; margin-bottom: 30px; }
-        .admin-card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .admin-card h2 { margin-bottom: 20px; color: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; }
+        
+        /* Admin Bar */
+        .admin-bar { background: #1e293b; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; position: sticky; top: 0; z-index: 1000; }
+        .admin-bar h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-bar h2 i { color: #f15a24; }
+        .admin-actions { display: flex; gap: 12px; }
+        .admin-actions button { padding: 8px 20px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-save { background: #10b981; color: white; }
+        .btn-save:hover { background: #059669; }
+        .btn-exit { background: #475569; color: white; }
+        .btn-exit:hover { background: #334155; }
+        .status { background: #334155; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; }
+        
+        /* Editor Panel */
+        .editor-container { display: flex; min-height: calc(100vh - 60px); }
+        .site-preview { flex: 1; background: white; overflow-y: auto; position: relative; }
+        .editor-sidebar { width: 380px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.05); }
+        
+        /* Bloques editables */
+        .editable-block { position: relative; cursor: pointer; transition: all 0.2s; }
+        .editable-block:hover { outline: 2px solid #f15a24; outline-offset: 2px; }
+        .editable-block.active { outline: 3px solid #f15a24; outline-offset: 3px; background: rgba(241,90,36,0.05); }
+        
+        .edit-indicator { position: absolute; top: -10px; right: -10px; background: #f15a24; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 10; opacity: 0; transition: opacity 0.2s; }
+        .editable-block:hover .edit-indicator { opacity: 1; }
+        
+        /* Formularios del sidebar */
+        .sidebar-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f15a24; }
         .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; color: #475569; }
-        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 14px; }
-        input:focus, textarea:focus { outline: none; border-color: #667eea; }
-        button { background: #10b981; color: white; border: none; padding: 12px 30px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-right: 10px; }
-        .btn-danger { background: #ef4444; }
-        .btn-warning { background: #f59e0b; }
-        .btn-primary { background: #3b82f6; }
-        .paquete-item { background: #f8fafc; border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0; }
-        .paquete-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .status { padding: 30px; text-align: center; background: #f1f5f9; border-radius: 16px; margin-top: 20px; }
-        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #e2e8f0; border-top-color: #10b981; border-radius: 50%; animation: spin 0.6s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 12px; z-index: 1000; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #1e293b; font-size: 0.85rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #f15a24; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .image-preview { width: 100%; height: 150px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+        .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .array-item { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+        .inline-icon { width: 30px; text-align: center; }
+        
+        @media (max-width: 768px) {
+            .editor-container { flex-direction: column; }
+            .editor-sidebar { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; }
+        }
     </style>
 </head>
 <body>
-<div class="admin-container">
-    <div class="admin-header">
-        <h1><i class="fas fa-crown"></i> Panel de Administración</h1>
-        <p>Gestiona todo el contenido de la web. Los cambios se publicarán automáticamente en el sitio estático.</p>
+
+<div class="admin-bar">
+    <h2><i class="fas fa-edit"></i> Editor Visual - Marcela Correa Turismo</h2>
+    <div class="admin-actions">
+        <span class="status" id="status"><i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> Listo</span>
+        <button class="btn-save" id="btn-save"><i class="fas fa-save"></i> Publicar cambios</button>
+        <button class="btn-exit" id="btn-exit"><i class="fas fa-eye"></i> Ver sitio</button>
     </div>
-    
-    <div class="admin-card">
-        <h2><i class="fas fa-heading"></i> Configuración del Header</h2>
-        <div class="form-group">
-            <label>Número de WhatsApp (sin +)</label>
-            <input type="text" id="whatsappNumber" placeholder="5493624331702">
-        </div>
-        <div class="form-group">
-            <label>Texto del Logo</label>
-            <input type="text" id="logoText" placeholder="marcela<br><span>correa</span> turismo">
-        </div>
-        <div class="form-group">
-            <label>URL del Logo</label>
-            <input type="text" id="logoImage" placeholder="https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg">
+</div>
+
+<div class="editor-container">
+    <div class="site-preview" id="site-preview">
+        <!-- Aquí se cargará el sitio público -->
+        <div style="display: flex; justify-content: center; align-items: center; height: 400px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #f15a24;"></i>
         </div>
     </div>
-    
-    <div class="admin-card">
-        <h2><i class="fas fa-film"></i> Sección Hero</h2>
-        <div class="form-group">
-            <label><input type="checkbox" id="heroEnabled"> Habilitar Hero</label>
+    <div class="editor-sidebar" id="editor-sidebar">
+        <div class="sidebar-title">
+            <i class="fas fa-mouse-pointer"></i> Editor de contenido
         </div>
-        <div class="form-group">
-            <label>Título</label>
-            <input type="text" id="heroTitle" value="Viajá con <span>Marcela Correa</span><br>y descubrí el mundo">
-        </div>
-        <div class="form-group">
-            <label>Subtítulo</label>
-            <textarea id="heroSubtitle" rows="2">Paquetes exclusivos con salidas garantizadas desde Resistencia, Corrientes y Villa Ángela.</textarea>
-        </div>
-        <div class="form-group">
-            <label>Imagen de fondo (URL)</label>
-            <input type="text" id="heroImage" value="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800">
-        </div>
-    </div>
-    
-    <div class="admin-card">
-        <h2><i class="fas fa-box"></i> Paquetes Turísticos</h2>
-        <div id="paquetes-container"></div>
-        <button onclick="agregarPaquete()" class="btn-primary"><i class="fas fa-plus"></i> Agregar paquete</button>
-    </div>
-    
-    <div class="admin-card">
-        <h2><i class="fas fa-check-circle"></i> Beneficios</h2>
-        <div id="beneficios-container"></div>
-        <button onclick="agregarBeneficio()" class="btn-primary"><i class="fas fa-plus"></i> Agregar beneficio</button>
-    </div>
-    
-    <div class="admin-card">
-        <h2><i class="fas fa-globe"></i> Footer</h2>
-        <div class="form-group">
-            <label>Texto de copyright</label>
-            <input type="text" id="copyright" value="© 2026 Marcela Correa Turismo · #HacemosRealidadTuViaje">
-        </div>
-        <div id="footer-columnas-container"></div>
-        <button onclick="agregarColumnaFooter()" class="btn-primary"><i class="fas fa-plus"></i> Agregar columna</button>
-    </div>
-    
-    <div class="admin-card">
-        <div style="display: flex; gap: 15px; justify-content: center;">
-            <button onclick="guardarCambios()" style="background: #10b981; padding: 15px 40px;"><i class="fas fa-save"></i> Guardar y Publicar</button>
-            <button onclick="cargarDatos()" class="btn-warning"><i class="fas fa-sync"></i> Recargar</button>
-        </div>
-        <div id="status" class="status">
-            <i class="fas fa-info-circle"></i> Listo para editar
+        <p style="color: #64748b; margin-bottom: 20px;">Haz clic en cualquier elemento del sitio para editarlo</p>
+        <div id="editor-form">
+            <p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>
         </div>
     </div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://TU_PROYECTO.supabase.co';
-    const SUPABASE_KEY = 'TU_ANON_KEY';
+    const SUPABASE_URL = 'https://fwqojlaepsfbbbwwguwd.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
+    const VERCEL_WEBHOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_6FdpSljEMxSx1lGEEx2RyV0npaYg/HqroRrnwu2';
+    
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
-    let datosActuales = {
-        header: { whatsappNumber: "5493624331702", logoText: "marcela<br><span>correa</span> turismo", logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg" },
-        hero: { enabled: true, title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", subtitle: "Paquetes exclusivos...", backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800" },
-        paquetes: [],
-        beneficios: [],
-        footer: { copyright: "© 2026 Marcela Correa Turismo", columnas: [] }
-    };
+    let currentData = null;
+    let selectedBlock = null;
+    let selectedPath = null;
     
-    async function cargarDatos() {
-        showStatus("Cargando datos...", "loading");
+    // Cargar el sitio y los datos
+    async function loadSite() {
+        // Cargar datos de Supabase
         const { data, error } = await supabase
             .from('website_content')
-            .select('*')
+            .select('contenido')
             .eq('id', 1)
             .single();
         
         if (data && data.contenido) {
-            datosActuales = data.contenido;
+            currentData = data.contenido;
         } else {
-            // Cargar paquetes de ejemplo
-            datosActuales.paquetes = [
-                { id: 1, nombre: "Buenos Aires Vip", precio: 199000, imagen: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3", badge: "Próxima salida", incluye: ["Hotel 5*", "Desayunos"] },
-                { id: 2, nombre: "Mendoza & Nieve", precio: 280000, imagen: "https://images.unsplash.com/photo-1533105079780-92b9be482077", badge: "Cupos reducidos", incluye: ["Bodegas", "Nieve"] }
-            ];
-            datosActuales.beneficios = [
-                { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles de primera línea" },
-                { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente" }
-            ];
-            datosActuales.footer.columnas = [
-                { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }] },
-                { titulo: "Contacto", enlaces: [{ texto: "WhatsApp", url: "https://wa.me/5493624331702" }] }
-            ];
+            // Datos por defecto
+            currentData = getDefaultData();
         }
         
-        renderizarFormularios();
-        showStatus("✅ Datos cargados correctamente", "success");
+        // Renderizar el sitio
+        renderSite();
     }
     
-    function renderizarFormularios() {
-        // Header
-        document.getElementById('whatsappNumber').value = datosActuales.header.whatsappNumber || '';
-        document.getElementById('logoText').value = datosActuales.header.logoText || '';
-        document.getElementById('logoImage').value = datosActuales.header.logoImage || '';
-        
-        // Hero
-        document.getElementById('heroEnabled').checked = datosActuales.hero.enabled;
-        document.getElementById('heroTitle').value = datosActuales.hero.title || '';
-        document.getElementById('heroSubtitle').value = datosActuales.hero.subtitle || '';
-        document.getElementById('heroImage').value = datosActuales.hero.backgroundImage || '';
-        
-        // Footer
-        document.getElementById('copyright').value = datosActuales.footer.copyright || '';
-        
-        // Paquetes
-        const paquetesContainer = document.getElementById('paquetes-container');
-        paquetesContainer.innerHTML = datosActuales.paquetes.map((p, idx) => `
-            <div class="paquete-item">
-                <div class="paquete-header">
-                    <strong>${p.nombre}</strong>
-                    <button onclick="eliminarPaquete(${idx})" class="btn-danger" style="padding: 5px 15px;">Eliminar</button>
-                </div>
-                <div class="form-group"><label>Nombre</label><input type="text" value="${p.nombre}" onchange="actualizarPaquete(${idx}, 'nombre', this.value)"></div>
-                <div class="form-group"><label>Precio</label><input type="number" value="${p.precio}" onchange="actualizarPaquete(${idx}, 'precio', parseInt(this.value))"></div>
-                <div class="form-group"><label>Imagen URL</label><input type="text" value="${p.imagen}" onchange="actualizarPaquete(${idx}, 'imagen', this.value)"></div>
-                <div class="form-group"><label>Badge</label><input type="text" value="${p.badge}" onchange="actualizarPaquete(${idx}, 'badge', this.value)"></div>
-                <div class="form-group"><label>Incluye (separado por comas)</label><input type="text" value="${p.incluye ? p.incluye.join(', ') : ''}" onchange="actualizarPaquete(${idx}, 'incluye', this.value.split(',').map(s=>s.trim()))"></div>
-            </div>
-        `).join('');
-        
-        // Beneficios
-        const beneficiosContainer = document.getElementById('beneficios-container');
-        beneficiosContainer.innerHTML = datosActuales.beneficios.map((b, idx) => `
-            <div class="paquete-item">
-                <div class="paquete-header">
-                    <strong>${b.titulo}</strong>
-                    <button onclick="eliminarBeneficio(${idx})" class="btn-danger" style="padding: 5px 15px;">Eliminar</button>
-                </div>
-                <div class="form-group"><label>Icono (clase FontAwesome)</label><input type="text" value="${b.icono}" onchange="actualizarBeneficio(${idx}, 'icono', this.value)"></div>
-                <div class="form-group"><label>Título</label><input type="text" value="${b.titulo}" onchange="actualizarBeneficio(${idx}, 'titulo', this.value)"></div>
-                <div class="form-group"><label>Descripción</label><input type="text" value="${b.descripcion}" onchange="actualizarBeneficio(${idx}, 'descripcion', this.value)"></div>
-            </div>
-        `).join('');
-        
-        // Footer columnas
-        const footerContainer = document.getElementById('footer-columnas-container');
-        footerContainer.innerHTML = datosActuales.footer.columnas.map((col, idx) => `
-            <div class="paquete-item">
-                <div class="paquete-header">
-                    <strong>${col.titulo}</strong>
-                    <button onclick="eliminarColumnaFooter(${idx})" class="btn-danger" style="padding: 5px 15px;">Eliminar</button>
-                </div>
-                <div class="form-group"><label>Título columna</label><input type="text" value="${col.titulo}" onchange="actualizarColumnaFooter(${idx}, 'titulo', this.value)"></div>
-                <div class="form-group"><label>Enlaces (JSON)</label><textarea rows="3" onchange="actualizarColumnaFooter(${idx}, 'enlaces', JSON.parse(this.value))">${JSON.stringify(col.enlaces, null, 2)}</textarea></div>
-            </div>
-        `).join('');
+    function getDefaultData() {
+        return {
+            header: { logoText: "marcela<br><span>correa</span> turismo", logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", whatsappNumber: "5493624331702" },
+            hero: { enabled: true, badge: "🌎 viajes de autor · cupos limitados", title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", subtitle: "Paquetes exclusivos con salidas garantizadas", backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", buttonPrimaryText: "Explorar paquetes", buttonSecondaryText: "Hablar por WhatsApp" },
+            paquetes: [],
+            beneficios: [
+                { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles y buses de primera línea" },
+                { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente en destino" },
+                { icono: "fa-credit-card", titulo: "Pago flexible", descripcion: "Tarjetas, efectivo, transferencia" },
+                { icono: "fa-map-pin", titulo: "Salidas garantizadas", descripcion: "Desde Resistencia, Corrientes y Villa Angela" }
+            ],
+            footer: { copyright: "© 2026 Marcela Correa Turismo", columnas: [{ titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }] }] }
+        };
     }
     
-    function actualizarPaquete(idx, campo, valor) { datosActuales.paquetes[idx][campo] = valor; }
-    function actualizarBeneficio(idx, campo, valor) { datosActuales.beneficios[idx][campo] = valor; }
-    function actualizarColumnaFooter(idx, campo, valor) { datosActuales.footer.columnas[idx][campo] = valor; }
-    function eliminarPaquete(idx) { datosActuales.paquetes.splice(idx, 1); renderizarFormularios(); }
-    function eliminarBeneficio(idx) { datosActuales.beneficios.splice(idx, 1); renderizarFormularios(); }
-    function eliminarColumnaFooter(idx) { datosActuales.footer.columnas.splice(idx, 1); renderizarFormularios(); }
-    function agregarPaquete() { datosActuales.paquetes.push({ id: Date.now(), nombre: "Nuevo destino", precio: 199000, imagen: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", badge: "Nuevo", incluye: [] }); renderizarFormularios(); }
-    function agregarBeneficio() { datosActuales.beneficios.push({ icono: "fa-star", titulo: "Nuevo beneficio", descripcion: "Descripción" }); renderizarFormularios(); }
-    function agregarColumnaFooter() { datosActuales.footer.columnas.push({ titulo: "Nueva columna", enlaces: [] }); renderizarFormularios(); }
+    function renderSite() {
+        const preview = document.getElementById('site-preview');
+        const whatsappUrl = `https://wa.me/${currentData.header.whatsappNumber}`;
+        
+        const paquetesHTML = (currentData.paquetes || []).map(p => `
+            <div class="card-paquete" data-editable="paquete" data-id="${p.id}">
+                <div class="card-img" style="background-image: url('${p.imagen}?w=500&h=260&fit=crop');"></div>
+                <div class="card-content">
+                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge}</div>
+                    <h3 class="card-title">${p.nombre}</h3>
+                    <div class="price">$${p.precio?.toLocaleString() || '0'} <small>pp</small></div>
+                    <div class="features">${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}</div>
+                    <p>${p.descripcionCorta || ''}</p>
+                    <div class="btn-card">Consultar ahora →</div>
+                </div>
+            </div>
+        `).join('');
+        
+        const beneficiosHTML = (currentData.beneficios || []).map((b, idx) => `
+            <div class="benefit" data-editable="beneficio" data-idx="${idx}">
+                <i class="fas ${b.icono}"></i>
+                <h4>${b.titulo}</h4>
+                <p>${b.descripcion}</p>
+            </div>
+        `).join('');
+        
+        const footerColumnasHTML = (currentData.footer?.columnas || []).map((col, idx) => `
+            <div class="footer-col" data-editable="footer-col" data-idx="${idx}">
+                <h4>${col.titulo}</h4>
+                ${(col.enlaces || []).map(link => `<a href="${link.url}" target="_blank"><i class="${link.icono || ''}"></i> ${link.texto}</a>`).join('')}
+            </div>
+        `).join('');
+        
+        const html = `
+            <style>
+                ${getSiteStyles()}
+            </style>
+            <div style="max-width: 1400px; margin: 0 auto;">
+                <!-- HEADER -->
+                <header class="main-header">
+                    <div class="container header-top">
+                        <a href="#" class="logo">
+                            <div class="logo-icon"><img src="${currentData.header.logoImage}"></div>
+                            <div class="logo-text">${currentData.header.logoText}</div>
+                        </a>
+                        <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> Reservar</a>
+                    </div>
+                </header>
+                
+                <!-- HERO -->
+                <div data-editable="hero">
+                    <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${currentData.hero.backgroundImage}'); background-size: cover;">
+                        <div class="container">
+                            <div class="hero-badge">${currentData.hero.badge}</div>
+                            <h1>${currentData.hero.title}</h1>
+                            <p>${currentData.hero.subtitle}</p>
+                            <div class="hero-buttons">
+                                <a href="#paquetes" class="btn-primary">${currentData.hero.buttonPrimaryText}</a>
+                                <a href="${whatsappUrl}" class="btn-outline">${currentData.hero.buttonSecondaryText}</a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- PAQUETES -->
+                <section class="paquetes">
+                    <div class="container">
+                        <h2 class="section-title">Próximas <span style="color: #f15a24;">salidas</span></h2>
+                        <div class="section-sub">Elegí tu experiencia, nosotros nos encargamos del resto</div>
+                        <div class="paquetes-grid">${paquetesHTML || '<p style="text-align:center">No hay paquetes. Agrega uno desde el editor.</p>'}</div>
+                        <button class="add-paquete-btn" onclick="window.addPaquete()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Paquete</button>
+                    </div>
+                </section>
+                
+                <!-- BENEFICIOS -->
+                <section class="benefits">
+                    <div class="container">
+                        <div class="benefits-grid">${beneficiosHTML}</div>
+                        <button class="add-beneficio-btn" onclick="window.addBeneficio()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Beneficio</button>
+                    </div>
+                </section>
+                
+                <!-- FOOTER -->
+                <footer class="footer">
+                    <div class="container">
+                        <div class="footer-grid">${footerColumnasHTML}</div>
+                        <div class="footer-bottom"><p>${currentData.footer.copyright}</p></div>
+                    </div>
+                </footer>
+            </div>
+        `;
+        
+        preview.innerHTML = html;
+        
+        // Agregar event listeners a bloques editables
+        document.querySelectorAll('[data-editable]').forEach(el => {
+            el.classList.add('editable-block');
+            const indicator = document.createElement('div');
+            indicator.className = 'edit-indicator';
+            indicator.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+            el.style.position = 'relative';
+            el.appendChild(indicator);
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectBlock(el);
+            });
+        });
+    }
     
-    async function guardarCambios() {
-        // Recoger datos de los inputs
-        datosActuales.header.whatsappNumber = document.getElementById('whatsappNumber').value;
-        datosActuales.header.logoText = document.getElementById('logoText').value;
-        datosActuales.header.logoImage = document.getElementById('logoImage').value;
-        datosActuales.hero.enabled = document.getElementById('heroEnabled').checked;
-        datosActuales.hero.title = document.getElementById('heroTitle').value;
-        datosActuales.hero.subtitle = document.getElementById('heroSubtitle').value;
-        datosActuales.hero.backgroundImage = document.getElementById('heroImage').value;
-        datosActuales.footer.copyright = document.getElementById('copyright').value;
+    function getSiteStyles() {
+        return `
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Inter', sans-serif; background: #ffffff; color: #111111; }
+            .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
+            .main-header { position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #eef2f5; z-index: 100; }
+            .header-top { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; flex-wrap: wrap; }
+            .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+            .logo-icon img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
+            .logo-text { font-weight: 800; font-size: 1.2rem; color: #111; }
+            .logo-text span { color: #f15a24; }
+            .btn-wa { background: #f15a24; padding: 10px 24px; border-radius: 40px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+            .hero { padding: 140px 0; color: white; text-align: center; }
+            .hero h1 { font-size: 4.2rem; font-weight: 800; margin-bottom: 20px; }
+            .hero h1 span { color: #f15a24; }
+            .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 32px; }
+            .hero-buttons { display: flex; gap: 20px; justify-content: center; }
+            .btn-primary { background: #f15a24; padding: 14px 36px; border-radius: 60px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+            .btn-outline { background: transparent; border: 1px solid white; padding: 12px 32px; border-radius: 60px; text-decoration: none; color: white; font-weight: 500; }
+            .paquetes { padding: 100px 0; }
+            .section-title { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 16px; }
+            .section-sub { text-align: center; color: #5b6e8c; margin-bottom: 64px; }
+            .paquetes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+            .card-paquete { background: white; border-radius: 24px; overflow: hidden; border: 1px solid #eef2f5; cursor: pointer; transition: 0.3s; }
+            .card-paquete:hover { transform: translateY(-8px); box-shadow: 0 24px 36px -12px rgba(0,0,0,0.15); }
+            .card-img { height: 240px; background-size: cover; background-position: center; }
+            .card-content { padding: 28px 24px; }
+            .card-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
+            .price { font-size: 2rem; font-weight: 800; color: #f15a24; margin: 16px 0; }
+            .badge { display: inline-block; background: #f15a24; color: white; font-size: 0.7rem; font-weight: 700; padding: 4px 12px; border-radius: 50px; margin-bottom: 12px; }
+            .features { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; font-size: 0.85rem; color: #5b6e8c; border-top: 1px solid #eef2f5; padding-top: 20px; }
+            .features i { color: #00b48a; margin-right: 6px; }
+            .btn-card { background: #eef2fa; border: none; padding: 14px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; text-align: center; }
+            .btn-card:hover { background: #f15a24; color: white; }
+            .benefits { background: #fafafc; padding: 80px 0; }
+            .benefits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+            .benefit i { font-size: 2rem; color: #f15a24; margin-bottom: 20px; }
+            .footer { background: #0a2540; color: rgba(255,255,255,0.8); padding: 60px 0 30px; }
+            .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+            .footer-col h4 { color: white; margin-bottom: 20px; }
+            .footer-col a { display: block; color: rgba(255,255,255,0.7); text-decoration: none; margin-bottom: 12px; }
+            .footer-bottom { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+            @media (max-width: 768px) {
+                .hero h1 { font-size: 2.2rem; }
+                .paquetes-grid { grid-template-columns: 1fr; }
+                .benefits-grid { grid-template-columns: 1fr; }
+                .container { padding: 0 24px; }
+            }
+        `;
+    }
+    
+    function selectBlock(el) {
+        // Remover clase active de todos
+        document.querySelectorAll('.editable-block').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
         
-        showStatus("📤 Guardando en Supabase...", "loading");
+        const type = el.getAttribute('data-editable');
+        const id = el.getAttribute('data-id');
+        const idx = el.getAttribute('data-idx');
         
-        // Guardar en Supabase
+        selectedBlock = el;
+        
+        // Mostrar formulario según tipo
+        if (type === 'hero') {
+            showHeroForm();
+        } else if (type === 'beneficio') {
+            showBeneficioForm(parseInt(idx));
+        } else if (type === 'footer-col') {
+            showFooterColForm(parseInt(idx));
+        } else if (type === 'paquete') {
+            showPaqueteForm(parseInt(id));
+        }
+    }
+    
+    function showHeroForm() {
+        const form = document.getElementById('editor-form');
+        form.innerHTML = `
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-film"></i> Editar Hero</h3>
+            <div class="form-group">
+                <label>Badge</label>
+                <input type="text" id="hero-badge" value="${escapeHtml(currentData.hero.badge)}">
+            </div>
+            <div class="form-group">
+                <label>Título (puede usar HTML)</label>
+                <textarea id="hero-title" rows="3">${escapeHtml(currentData.hero.title)}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Subtítulo</label>
+                <textarea id="hero-subtitle" rows="2">${escapeHtml(currentData.hero.subtitle)}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Imagen de fondo (URL)</label>
+                <input type="text" id="hero-image" value="${currentData.hero.backgroundImage}">
+                <div class="image-preview" style="background-image: url('${currentData.hero.backgroundImage}'); margin-top: 10px;"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary" value="${currentData.hero.buttonPrimaryText}"></div>
+                <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary" value="${currentData.hero.buttonSecondaryText}"></div>
+            </div>
+            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateHero()">Actualizar Hero</button>
+        `;
+        
+        const imgInput = document.getElementById('hero-image');
+        imgInput.addEventListener('input', (e) => {
+            document.querySelector('.image-preview').style.backgroundImage = `url('${e.target.value}')`;
+        });
+    }
+    
+    function showBeneficioForm(idx) {
+        const b = currentData.beneficios[idx];
+        const form = document.getElementById('editor-form');
+        form.innerHTML = `
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-gem"></i> Editar Beneficio</h3>
+            <div class="form-group">
+                <label>Icono (clase FontAwesome, ej: fa-crown)</label>
+                <input type="text" id="beneficio-icono" value="${b.icono}">
+            </div>
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="beneficio-titulo" value="${escapeHtml(b.titulo)}">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="beneficio-descripcion" rows="2">${escapeHtml(b.descripcion)}</textarea>
+            </div>
+            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateBeneficio(${idx})">Actualizar Beneficio</button>
+            <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removeBeneficio(${idx})">Eliminar Beneficio</button>
+        `;
+    }
+    
+    function showFooterColForm(idx) {
+        const col = currentData.footer.columnas[idx];
+        const form = document.getElementById('editor-form');
+        form.innerHTML = `
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-globe"></i> Editar Columna de Footer</h3>
+            <div class="form-group">
+                <label>Título de la columna</label>
+                <input type="text" id="footer-titulo" value="${escapeHtml(col.titulo)}">
+            </div>
+            <div class="form-group">
+                <label>Enlaces (edita el JSON)</label>
+                <textarea id="footer-enlaces" rows="6">${JSON.stringify(col.enlaces, null, 2)}</textarea>
+            </div>
+            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateFooterCol(${idx})">Actualizar Columna</button>
+        `;
+    }
+    
+    function showPaqueteForm(id) {
+        const p = currentData.paquetes.find(p => p.id === id);
+        if (!p) return;
+        
+        const form = document.getElementById('editor-form');
+        form.innerHTML = `
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-box"></i> Editar Paquete: ${p.nombre}</h3>
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="paquete-nombre" value="${escapeHtml(p.nombre)}">
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Precio</label><input type="number" id="paquete-precio" value="${p.precio}"></div>
+                <div class="form-group"><label>Badge</label><input type="text" id="paquete-badge" value="${p.badge}"></div>
+            </div>
+            <div class="form-group">
+                <label>Imagen (URL)</label>
+                <input type="text" id="paquete-imagen" value="${p.imagen}">
+                <div class="image-preview" style="background-image: url('${p.imagen}?w=300&h=180&fit=crop'); margin-top: 10px;"></div>
+            </div>
+            <div class="form-group">
+                <label>Descripción corta</label>
+                <textarea id="paquete-descripcion" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Incluye (separado por comas)</label>
+                <input type="text" id="paquete-incluye" value="${(p.incluye || []).join(', ')}">
+            </div>
+            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updatePaquete(${id})">Actualizar Paquete</button>
+            <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removePaquete(${id})">Eliminar Paquete</button>
+        `;
+        
+        const imgInput = document.getElementById('paquete-imagen');
+        imgInput.addEventListener('input', (e) => {
+            document.querySelector('.image-preview').style.backgroundImage = `url('${e.target.value}?w=300&h=180&fit=crop')`;
+        });
+    }
+    
+    function updateHero() {
+        currentData.hero.badge = document.getElementById('hero-badge').value;
+        currentData.hero.title = document.getElementById('hero-title').value;
+        currentData.hero.subtitle = document.getElementById('hero-subtitle').value;
+        currentData.hero.backgroundImage = document.getElementById('hero-image').value;
+        currentData.hero.buttonPrimaryText = document.getElementById('hero-btn-primary').value;
+        currentData.hero.buttonSecondaryText = document.getElementById('hero-btn-secondary').value;
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    }
+    
+    function updateBeneficio(idx) {
+        currentData.beneficios[idx] = {
+            icono: document.getElementById('beneficio-icono').value,
+            titulo: document.getElementById('beneficio-titulo').value,
+            descripcion: document.getElementById('beneficio-descripcion').value
+        };
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    }
+    
+    function removeBeneficio(idx) {
+        if (confirm('¿Eliminar este beneficio?')) {
+            currentData.beneficios.splice(idx, 1);
+            renderSite();
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+            document.getElementById('editor-form').innerHTML = '<p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>';
+        }
+    }
+    
+    function updateFooterCol(idx) {
+        currentData.footer.columnas[idx] = {
+            titulo: document.getElementById('footer-titulo').value,
+            enlaces: JSON.parse(document.getElementById('footer-enlaces').value)
+        };
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    }
+    
+    function updatePaquete(id) {
+        const paquete = currentData.paquetes.find(p => p.id === id);
+        if (paquete) {
+            paquete.nombre = document.getElementById('paquete-nombre').value;
+            paquete.precio = parseInt(document.getElementById('paquete-precio').value);
+            paquete.badge = document.getElementById('paquete-badge').value;
+            paquete.imagen = document.getElementById('paquete-imagen').value;
+            paquete.descripcionCorta = document.getElementById('paquete-descripcion').value;
+            paquete.incluye = document.getElementById('paquete-incluye').value.split(',').map(s => s.trim());
+        }
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    }
+    
+    function removePaquete(id) {
+        if (confirm('¿Eliminar este paquete?')) {
+            currentData.paquetes = currentData.paquetes.filter(p => p.id !== id);
+            renderSite();
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+            document.getElementById('editor-form').innerHTML = '<p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>';
+        }
+    }
+    
+    window.addPaquete = function() {
+        const newId = Date.now();
+        if (!currentData.paquetes) currentData.paquetes = [];
+        currentData.paquetes.push({
+            id: newId,
+            nombre: "Nuevo Destino",
+            precio: 199000,
+            imagen: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
+            badge: "Nuevo",
+            badgeColor: "#f15a24",
+            descripcionCorta: "Descripción del nuevo paquete",
+            incluye: ["Incluye 1", "Incluye 2"]
+        });
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    };
+    
+    window.addBeneficio = function() {
+        if (!currentData.beneficios) currentData.beneficios = [];
+        currentData.beneficios.push({
+            icono: "fa-star",
+            titulo: "Nuevo beneficio",
+            descripcion: "Descripción del beneficio"
+        });
+        renderSite();
+        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+    };
+    
+    async function saveChanges() {
+        document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        
         const { error } = await supabase
             .from('website_content')
-            .upsert({ id: 1, contenido: datosActuales, updated_at: new Date() });
+            .upsert({ id: 1, contenido: currentData, updated_at: new Date() });
         
         if (error) {
-            showStatus("❌ Error: " + error.message, "error");
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #ef4444; font-size: 10px;"></i> Error: ' + error.message;
+            alert('Error al guardar: ' + error.message);
             return;
         }
         
-        showStatus("✅ Contenido guardado. Disparando reconstrucción...", "success");
-        
-        // 🔥 DISPARAR WEBHOOK A VERCEL (para reconstruir el sitio)
-        await dispararWebhook();
-    }
-    
-    async function dispararWebhook() {
-        // URL del webhook de Vercel (lo configuras en Vercel Dashboard)
-        const VERCEL_DEPLOY_HOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_XXXXXX/XXXXXXXX'; // ← TU WEBHOOK
-        
+        // Disparar webhook de Vercel
         try {
-            const response = await fetch(VERCEL_DEPLOY_HOOK, { method: 'POST' });
-            if (response.ok) {
-                showStatus("🚀 Reconstrucción iniciada en Vercel. El sitio se actualizará en 1-2 minutos.", "success");
-            } else {
-                showStatus("⚠️ Webhook falló, pero los datos están guardados. Reconstruye manualmente en Vercel.", "warning");
-            }
+            await fetch(VERCEL_WEBHOOK, { method: 'POST' });
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> ¡Publicado! El sitio se actualizará en 1-2 minutos.';
         } catch(e) {
-            console.log("Webhook no configurado. Reconstrucción manual necesaria.");
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Guardado, pero webhook falló.';
         }
+        
+        // Mostrar mensaje de éxito
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 12px; z-index: 2000;';
+        toast.innerHTML = '<i class="fas fa-check-circle"></i> Cambios publicados exitosamente!';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
     
-    function showStatus(msg, type) {
-        const statusDiv = document.getElementById('status');
-        statusDiv.innerHTML = `<i class="fas ${type === 'loading' ? 'fa-spinner fa-spin' : (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle')}"></i> ${msg}`;
-        statusDiv.style.background = type === 'success' ? '#d1fae5' : (type === 'error' ? '#fee2e2' : '#fef3c7');
+    function exitEditor() {
+        window.location.href = '/';
     }
     
-    cargarDatos();
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    document.getElementById('btn-save').addEventListener('click', saveChanges);
+    document.getElementById('btn-exit').addEventListener('click', exitEditor);
+    
+    loadSite();
 </script>
 </body>
 </html>
