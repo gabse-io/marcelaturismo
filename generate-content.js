@@ -5,33 +5,41 @@ const SUPABASE_URL = process.env.SUPABASE_URL || 'https://fwqojlaepsfbbbwwguwd.s
 const SUPABASE_KEY = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
 
 async function fetchContent() {
-    return new Promise((resolve, reject) => {
-        const url = `${SUPABASE_URL}/rest/v1/website_content?select=contenido&id=eq.1`;
-        
-        const options = {
+    console.log('🔍 Conectando a Supabase...');
+    console.log('URL:', SUPABASE_URL);
+    
+    const url = `${SUPABASE_URL}/rest/v1/website_content?select=contenido&id=eq.1`;
+    
+    try {
+        const response = await fetch(url, {
             headers: {
                 'apikey': SUPABASE_KEY,
                 'Authorization': `Bearer ${SUPABASE_KEY}`
             }
-        };
+        });
         
-        https.get(url, options, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const json = JSON.parse(data);
-                    if (json && json[0] && json[0].contenido) {
-                        resolve(json[0].contenido);
-                    } else {
-                        resolve(getDefaultContent());
-                    }
-                } catch(e) {
-                    resolve(getDefaultContent());
-                }
-            });
-        }).on('error', () => resolve(getDefaultContent()));
-    });
+        console.log('📡 Status:', response.status);
+        
+        if (!response.ok) {
+            console.log('❌ Error HTTP:', response.status);
+            return getDefaultContent();
+        }
+        
+        const data = await response.json();
+        console.log('📦 Datos recibidos:', data ? 'OK' : 'VACIO');
+        
+        if (data && data[0] && data[0].contenido) {
+            console.log('✅ Datos cargados desde Supabase');
+            console.log('📊 Paquetes:', data[0].contenido.paquetes?.length || 0);
+            return data[0].contenido;
+        } else {
+            console.log('⚠️ No hay datos, usando default');
+            return getDefaultContent();
+        }
+    } catch (error) {
+        console.log('❌ Error:', error.message);
+        return getDefaultContent();
+    }
 }
 
 function getDefaultContent() {
