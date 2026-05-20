@@ -1,8 +1,8 @@
 const fs = require('fs');
 const https = require('https');
 
-const SUPABASE_URL = 'https://fwqojlaepsfbbbwwguwd.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://fwqojlaepsfbbbwwguwd.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
 
 async function fetchContent() {
     return new Promise((resolve, reject) => {
@@ -36,21 +36,59 @@ async function fetchContent() {
 
 function getDefaultContent() {
     return {
+        // Configuración global del sitio
+        config: {
+            siteName: "Marcela Correa Turismo",
+            primaryColor: "#f15a24",
+            secondaryColor: "#0a2540",
+            accentColor: "#00b48a",
+            fontFamily: "'Inter', sans-serif"
+        },
+        // Header completo
         header: {
             logoText: "marcela<br><span>correa</span> turismo",
             logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg",
-            whatsappNumber: "5493624331702"
+            logoWidth: "55px",
+            logoHeight: "55px",
+            whatsappNumber: "5493624331702",
+            whatsappText: "Reservar",
+            backgroundColor: "rgba(255,255,255,0.96)",
+            textColor: "#111111"
         },
+        // Hero con múltiples banners
         hero: {
             enabled: true,
-            badge: "🌎 viajes de autor · cupos limitados",
-            title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo",
-            subtitle: "Paquetes exclusivos con salidas garantizadas desde Resistencia, Corrientes y Villa Ángela.",
-            backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&h=600&fit=crop",
-            buttonPrimaryText: "Explorar paquetes",
-            buttonPrimaryLink: "#paquetes",
-            buttonSecondaryText: "Hablar por WhatsApp"
+            autoplaySpeed: 5000,
+            slides: [
+                {
+                    id: 1,
+                    badge: "🌎 viajes de autor · cupos limitados",
+                    title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo",
+                    subtitle: "Paquetes exclusivos con salidas garantizadas desde Resistencia, Corrientes y Villa Ángela.",
+                    backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&h=600&fit=crop",
+                    buttonPrimaryText: "Explorar paquetes",
+                    buttonPrimaryLink: "#paquetes",
+                    buttonSecondaryText: "Hablar por WhatsApp"
+                },
+                {
+                    id: 2,
+                    badge: "🏔️ Destinos únicos",
+                    title: "Descubrí <span>Mendoza & Nieve</span><br>la mejor experiencia",
+                    subtitle: "Salidas garantizadas con los mejores precios y servicios exclusivos.",
+                    backgroundImage: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=1600&h=600&fit=crop",
+                    buttonPrimaryText: "Ver destinos",
+                    buttonPrimaryLink: "#paquetes",
+                    buttonSecondaryText: "Contactar"
+                }
+            ]
         },
+        // Sección de paquetes (título y subtítulo editables)
+        seccionPaquetes: {
+            title: "Próximas <span style=\"color: #f15a24;\">salidas</span>",
+            subtitle: "Elegí tu experiencia, nosotros nos encargamos del resto",
+            backgroundColor: "#ffffff"
+        },
+        // Paquetes con datos completos para modal
         paquetes: [
             {
                 id: 1,
@@ -60,11 +98,11 @@ function getDefaultContent() {
                 badge: "Próxima salida",
                 badgeColor: "#f15a24",
                 descripcionCorta: "Salida 12 de Junio. Incluye excursiones a River, Boca, San Telmo, Luján.",
-                descripcionCompleta: "Disfrutá de la ciudad porteña con alojamiento de lujo, city tour completo y excursiones a los estadios más emblemáticos.",
+                descripcionCompleta: "Disfrutá de la ciudad porteña con alojamiento de lujo, city tour completo y excursiones a los estadios más emblemáticos. Incluye traslados, entradas y guía especializado.",
                 ciudad: "Buenos Aires",
                 noches: "2 noches",
                 salida: "12 de Junio",
-                incluye: ["Hotel 5 estrellas Luxon", "Bus mix cama", "City tour completo", "Entradas a estadios"],
+                incluye: ["Hotel 5 estrellas Luxon", "Bus mix cama", "City tour completo", "Entradas a estadios", "Desayunos", "Guía local"],
                 itinerario: [
                     { dia: "Día 1", titulo: "Llegada a Buenos Aires", texto: "Recepción en el aeropuerto y traslado al hotel Luxon. Por la tarde, paseo por Puerto Madero y cena opcional." },
                     { dia: "Día 2", titulo: "City Tour y estadios", texto: "Desayuno. Recorrido por San Telmo, La Boca (con visita a La Bombonera), Palermo y Recoleta. Almuerzo incluido." },
@@ -84,11 +122,11 @@ function getDefaultContent() {
                 badge: "Cupos reducidos",
                 badgeColor: "#00b48a",
                 descripcionCorta: "Salidas 30 de Abril / 22 Mayo. Desayunos, guía local, traslados.",
-                descripcionCompleta: "Mendoza y la alta montaña. Visita a bodegas, excursión a la nieve y paisajes increíbles.",
+                descripcionCompleta: "Mendoza y la alta montaña. Visita a bodegas, excursión a la nieve y paisajes increíbles. Experiencia única en la Cordillera de los Andes.",
                 ciudad: "Mendoza",
                 noches: "2 noches",
                 salida: "30 de Abril / 22 Mayo",
-                incluye: ["Bodegas con degustación", "Excursión a la nieve", "Desayunos", "Guía local", "Traslados"],
+                incluye: ["Bodegas con degustación", "Excursión a la nieve", "Desayunos", "Guía local", "Traslados", "Equipo de montaña"],
                 itinerario: [
                     { dia: "Día 1", titulo: "Llegada y city tour", texto: "Llegada a Mendoza. Por la tarde, recorrido por la ciudad y visita a bodega con degustación." },
                     { dia: "Día 2", titulo: "Alta montaña y nieve", texto: "Excursión a la Cordillera de los Andes, Potrerillos, Puente del Inca y Aconcagua. Nieve garantizada." },
@@ -108,11 +146,11 @@ function getDefaultContent() {
                 badge: "Todo incluido",
                 badgeColor: "#520968",
                 descripcionCorta: "2 noches, Termas de Río Hondo, visitas guiadas.",
-                descripcionCompleta: "Relajación en las Termas de Río Hondo y paisajes de Tafí del Valle.",
+                descripcionCompleta: "Relajación en las Termas de Río Hondo y paisajes de Tafí del Valle. Un destino ideal para descansar y conectar con la naturaleza.",
                 ciudad: "Tucumán / Santiago del Estero",
                 noches: "2 noches",
                 salida: "Consultar fechas",
-                incluye: ["Termas incluidas", "Pensión completa", "Visitas guiadas", "Hotel con aguas termales"],
+                incluye: ["Termas incluidas", "Pensión completa", "Visitas guiadas", "Hotel con aguas termales", "Spa", "Traslados"],
                 itinerario: [
                     { dia: "Día 1", titulo: "Llegada a Termas", texto: "Llegada a Termas de Río Hondo. Alojamiento en hotel con termas. Noche de relax." },
                     { dia: "Día 2", titulo: "Termas y circuito", texto: "Día completo en el complejo termal. Opcional: paseo por el dique." },
@@ -124,14 +162,22 @@ function getDefaultContent() {
                 whatsapp: "Hola! Quiero reservar el paquete TAFÍ + TERMAS"
             }
         ],
+        // Sección de beneficios (título editable)
+        seccionBeneficios: {
+            title: "¿Por qué viajar con nosotros?",
+            backgroundColor: "#fafafc"
+        },
         beneficios: [
             { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles y buses de primera línea" },
             { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente en destino" },
             { icono: "fa-credit-card", titulo: "Pago flexible", descripcion: "Tarjetas, efectivo, transferencia" },
             { icono: "fa-map-pin", titulo: "Salidas garantizadas", descripcion: "Desde Resistencia, Corrientes y Villa Angela" }
         ],
+        // Footer completo
         footer: {
             copyright: "© 2026 Marcela Correa Turismo · #HacemosRealidadTuViaje",
+            backgroundColor: "#0a2540",
+            textColor: "rgba(255,255,255,0.8)",
             columnas: [
                 { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }, { texto: "Política de cancelación", url: "#" }, { texto: "Medios de pago", url: "#" }] },
                 { titulo: "Destinos", enlaces: [{ texto: "Buenos Aires", url: "#" }, { texto: "Mendoza", url: "#" }, { texto: "Termas de Río Hondo", url: "#" }, { texto: "Salta", url: "#" }] },
@@ -146,20 +192,44 @@ async function generateHTML() {
     
     const content = await fetchContent();
     const whatsappUrl = `https://wa.me/${content.header.whatsappNumber}`;
+    const primaryColor = content.config?.primaryColor || "#f15a24";
+    const secondaryColor = content.config?.secondaryColor || "#0a2540";
+    
+    // Generar slides del Hero (múltiples banners)
+    const heroSlidesHTML = content.hero.slides.map((slide, idx) => `
+        <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-slide="${idx}">
+            <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${slide.backgroundImage}'); background-size: cover; background-position: center;">
+                <div class="container">
+                    <div class="hero-badge">${slide.badge}</div>
+                    <h1>${slide.title}</h1>
+                    <p>${slide.subtitle}</p>
+                    <div class="hero-buttons">
+                        <a href="${slide.buttonPrimaryLink}" class="btn-primary">${slide.buttonPrimaryText}</a>
+                        <a href="${whatsappUrl}" class="btn-outline" target="_blank">${slide.buttonSecondaryText}</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    `).join('');
+    
+    // Generar dots del slider
+    const heroDotsHTML = content.hero.slides.map((_, idx) => `
+        <button class="hero-dot ${idx === 0 ? 'active' : ''}" data-slide="${idx}"></button>
+    `).join('');
     
     // Generar paquetes HTML
     const paquetesHTML = content.paquetes.map(p => `
-        <div class="card-paquete" onclick="abrirModal(${p.id})">
+        <div class="card-paquete" data-id="${p.id}">
             <div class="card-img" style="background-image: url('${p.imagen}?w=500&h=260&fit=crop');"></div>
             <div class="card-content">
-                <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge}</div>
+                <div class="badge" style="background: ${p.badgeColor || primaryColor}">${p.badge}</div>
                 <h3 class="card-title">${p.nombre}</h3>
                 <div class="price">$${p.precio.toLocaleString()} <small>pp</small></div>
                 <div class="features">
                     ${p.incluye.slice(0, 3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}
                 </div>
                 <p>${p.descripcionCorta}</p>
-                <div class="btn-card" onclick="event.stopPropagation(); window.open('${whatsappUrl}?text=${encodeURIComponent(p.whatsapp)}','_blank')">Consultar ahora →</div>
+                <div class="btn-card">Consultar ahora →</div>
             </div>
         </div>
     `).join('');
@@ -195,7 +265,8 @@ async function generateHTML() {
             descripcion: p.descripcionCompleta,
             whatsapp: p.whatsapp,
             itinerario: p.itinerario,
-            hoteles: p.hoteles
+            hoteles: p.hoteles,
+            incluye: p.incluye
         };
     });
     
@@ -206,41 +277,52 @@ async function generateHTML() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Marcela Correa | Paquetes de autor</title>
+    <title>${content.config?.siteName || 'Marcela Correa | Paquetes de autor'}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #ffffff; color: #111111; scroll-behavior: smooth; }
+        body { font-family: ${content.config?.fontFamily || "'Inter', sans-serif"}; background: #ffffff; color: #111111; scroll-behavior: smooth; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-        :root { --naranja: #f15a24; --naranja-hover: #d94712; --azul-claro: #eef2fa; --azul-profundo: #0a2540; --verde-menta: #00b48a; --gris-fondo: #fafafc; --gris-bordes: #eef2f5; --texto-claro: #5b6e8c; }
+        :root { --naranja: ${primaryColor}; --naranja-hover: #d94712; --azul-claro: #eef2fa; --azul-profundo: ${secondaryColor}; --verde-menta: ${content.config?.accentColor || '#00b48a'}; --gris-fondo: #fafafc; --gris-bordes: #eef2f5; --texto-claro: #5b6e8c; }
         
-        .main-header { position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); z-index: 100; border-bottom: 1px solid var(--gris-bordes); }
+        /* Header */
+        .main-header { position: sticky; top: 0; background: ${content.header.backgroundColor}; backdrop-filter: blur(8px); z-index: 100; border-bottom: 1px solid var(--gris-bordes); }
         .header-top { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; flex-wrap: wrap; }
         .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-icon img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
-        .logo-text { font-weight: 800; font-size: 1.2rem; line-height: 1.2; letter-spacing: -0.3px; color: #111; }
+        .logo-icon img { width: ${content.header.logoWidth}; height: ${content.header.logoHeight}; border-radius: 12px; object-fit: cover; }
+        .logo-text { font-weight: 800; font-size: 1.2rem; line-height: 1.2; letter-spacing: -0.3px; color: ${content.header.textColor}; }
         .logo-text span { color: var(--naranja); }
         .btn-wa { background: var(--naranja); padding: 10px 24px; border-radius: 40px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-wa:hover { background: var(--naranja-hover); transform: scale(1.02); }
         
-        .hero { position: relative; background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${content.hero.backgroundImage}'); background-size: cover; background-position: center 30%; padding: 140px 0; color: white; text-align: center; }
+        /* Hero Slider */
+        .hero-slider { position: relative; overflow: hidden; }
+        .hero-slide { display: none; }
+        .hero-slide.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .hero { padding: 140px 0; color: white; text-align: center; }
         .hero-badge { display: inline-block; background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); padding: 6px 18px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; margin-bottom: 28px; }
         .hero h1 { font-size: 4.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .hero h1 span { color: var(--naranja); }
         .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 32px; opacity: 0.9; }
         .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+        .hero-dots { position: absolute; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; gap: 12px; z-index: 10; }
+        .hero-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; cursor: pointer; transition: 0.2s; }
+        .hero-dot.active { background: var(--naranja); transform: scale(1.2); }
+        
         .btn-primary { background: var(--naranja); padding: 14px 36px; border-radius: 60px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-primary:hover { background: var(--naranja-hover); transform: translateY(-2px); }
         .btn-outline { background: transparent; border: 1px solid white; padding: 12px 32px; border-radius: 60px; text-decoration: none; color: white; font-weight: 500; transition: 0.2s; }
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--naranja); }
         
-        .paquetes { padding: 100px 0; background: white; }
+        /* Paquetes */
+        .paquetes { padding: 100px 0; background: ${content.seccionPaquetes.backgroundColor}; }
         .section-title { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 16px; letter-spacing: -1px; }
         .section-sub { text-align: center; color: var(--texto-claro); margin-bottom: 64px; font-size: 1.1rem; }
         .paquetes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
         
-        .card-paquete { background: white; border-radius: 24px; overflow: hidden; border: 1px solid var(--gris-bordes); transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-decoration: none; color: inherit; display: block; }
+        .card-paquete { background: white; border-radius: 24px; overflow: hidden; border: 1px solid var(--gris-bordes); transition: all 0.3s cubic-bezier(0.2, 0, 0, 1); cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .card-paquete:hover { transform: translateY(-8px); box-shadow: 0 24px 36px -12px rgba(0,0,0,0.15); border-color: var(--naranja); }
         .card-img { height: 240px; background-size: cover; background-position: center; transition: transform 0.4s ease; }
         .card-paquete:hover .card-img { transform: scale(1.02); }
@@ -254,13 +336,15 @@ async function generateHTML() {
         .btn-card { background: var(--azul-claro); border: none; padding: 14px 24px; border-radius: 40px; font-weight: 600; color: var(--azul-profundo); cursor: pointer; width: 100%; transition: 0.2s; font-size: 0.9rem; margin-top: 8px; text-align: center; display: block; }
         .btn-card:hover { background: var(--naranja); color: white; }
         
-        .benefits { background: var(--gris-fondo); padding: 80px 0; }
+        /* Beneficios */
+        .benefits { background: ${content.seccionBeneficios.backgroundColor}; padding: 80px 0; }
         .benefits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
         .benefit i { font-size: 2rem; color: var(--naranja); margin-bottom: 20px; }
         .benefit h4 { font-size: 1.2rem; margin-bottom: 10px; }
         .benefit p { color: var(--texto-claro); font-size: 0.9rem; }
         
-        .footer { background: #0a2540; color: rgba(255,255,255,0.8); padding: 60px 0 30px; }
+        /* Footer */
+        .footer { background: ${content.footer.backgroundColor}; color: ${content.footer.textColor}; padding: 60px 0 30px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
         .footer-col h4 { font-weight: 700; margin-bottom: 20px; color: white; }
         .footer-col a { display: block; color: rgba(255,255,255,0.7); text-decoration: none; margin-bottom: 12px; font-size: 0.85rem; }
@@ -297,6 +381,10 @@ async function generateHTML() {
         .btn-reservar-modal { background: var(--naranja); padding: 14px 40px; border-radius: 60px; text-decoration: none; color: white; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; margin-top: 30px; border: none; cursor: pointer; }
         .btn-reservar-modal:hover { background: var(--naranja-hover); transform: translateY(-2px); }
         
+        /* Lista de inclusión en modal */
+        .modal-incluye { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+        .modal-incluye span { background: var(--azul-claro); padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; color: var(--azul-profundo); }
+        
         @media (max-width: 768px) {
             .container { padding: 0 24px; }
             .hero h1 { font-size: 2.2rem; }
@@ -317,26 +405,21 @@ async function generateHTML() {
             <div class="logo-icon"><img src="${content.header.logoImage}"></div>
             <div class="logo-text">${content.header.logoText}</div>
         </a>
-        <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> Reservar</a>
+        <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> ${content.header.whatsappText}</a>
     </div>
 </header>
 
-<section class="hero">
-    <div class="container">
-        <div class="hero-badge">${content.hero.badge}</div>
-        <h1>${content.hero.title}</h1>
-        <p>${content.hero.subtitle}</p>
-        <div class="hero-buttons">
-            <a href="#paquetes" class="btn-primary"><i class="fas fa-map-marked-alt"></i> ${content.hero.buttonPrimaryText}</a>
-            <a href="${whatsappUrl}" class="btn-outline" target="_blank">${content.hero.buttonSecondaryText}</a>
-        </div>
+<div class="hero-slider" id="hero-slider">
+    ${heroSlidesHTML}
+    <div class="hero-dots">
+        ${heroDotsHTML}
     </div>
-</section>
+</div>
 
 <section id="paquetes" class="paquetes">
     <div class="container">
-        <h2 class="section-title">Próximas <span style="color: var(--naranja);">salidas</span></h2>
-        <div class="section-sub">Elegí tu experiencia, nosotros nos encargamos del resto</div>
+        <h2 class="section-title">${content.seccionPaquetes.title}</h2>
+        <div class="section-sub">${content.seccionPaquetes.subtitle}</div>
         <div class="paquetes-grid">
             ${paquetesHTML}
         </div>
@@ -345,6 +428,7 @@ async function generateHTML() {
 
 <section class="benefits">
     <div class="container">
+        <h2 class="section-title">${content.seccionBeneficios.title}</h2>
         <div class="benefits-grid">
             ${beneficiosHTML}
         </div>
@@ -377,6 +461,8 @@ async function generateHTML() {
             <div class="modal-body">
                 <div class="modal-features" id="modal-features"></div>
                 <p id="modal-descripcion"></p>
+                <h3>Qué incluye</h3>
+                <div id="modal-incluye" class="modal-incluye"></div>
                 <h3 style="margin: 30px 0 20px;">Itinerario día a día</h3>
                 <div id="modal-itinerario"></div>
                 <h3 style="margin: 30px 0 20px;">Posibles alojamientos</h3>
@@ -389,6 +475,40 @@ async function generateHTML() {
 
 <script>
     const paquetes = ${paquetesJson};
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    let autoPlayInterval;
+    
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === index);
+        });
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+        currentSlide = index;
+    }
+    
+    function nextSlide() {
+        let next = (currentSlide + 1) % slides.length;
+        showSlide(next);
+    }
+    
+    function startAutoPlay() {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(nextSlide, ${content.hero.autoplaySpeed || 5000});
+    }
+    
+    if (slides.length > 1) {
+        startAutoPlay();
+        dots.forEach((dot, idx) => {
+            dot.addEventListener('click', () => {
+                showSlide(idx);
+                startAutoPlay();
+            });
+        });
+    }
     
     function abrirModal(id) {
         const data = paquetes[id];
@@ -399,6 +519,7 @@ async function generateHTML() {
         document.getElementById('modal-hero').style.backgroundImage = "url('" + data.imagen + "')";
         document.getElementById('modal-descripcion').innerText = data.descripcion;
         
+        // Features
         document.getElementById('modal-features').innerHTML = \`
             <span><i class="fas fa-map-marker-alt"></i> \${data.ciudad}</span>
             <span><i class="fas fa-bed"></i> \${data.noches}</span>
@@ -406,6 +527,10 @@ async function generateHTML() {
             <span><i class="fas fa-utensils"></i> Desayuno incluido</span>
         \`;
         
+        // Incluye
+        document.getElementById('modal-incluye').innerHTML = data.incluye.map(i => \`<span><i class="fas fa-check-circle"></i> \${i}</span>\`).join('');
+        
+        // Itinerario
         const itinerarioContainer = document.getElementById('modal-itinerario');
         itinerarioContainer.innerHTML = '';
         data.itinerario.forEach(function(item) {
@@ -422,6 +547,7 @@ async function generateHTML() {
             \`;
         });
         
+        // Hoteles
         const hotelesContainer = document.getElementById('modal-hoteles');
         hotelesContainer.innerHTML = '';
         data.hoteles.forEach(function(hotel) {
@@ -438,7 +564,7 @@ async function generateHTML() {
             \`;
         });
         
-        document.getElementById('modal-whatsapp').onclick = function() {
+        document.getElementById('modal-whatsapp').onclick = () => {
             window.open('${whatsappUrl}?text=' + encodeURIComponent(data.whatsapp), '_blank');
         };
         
@@ -457,6 +583,11 @@ async function generateHTML() {
         content.classList.toggle('show');
     }
     
+    document.querySelectorAll('.card-paquete').forEach(card => {
+        const id = card.getAttribute('data-id');
+        card.addEventListener('click', () => abrirModal(parseInt(id)));
+    });
+    
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && document.getElementById('modal-detalle').style.display === 'block') {
             cerrarModal();
@@ -473,6 +604,7 @@ async function generateHTML() {
     fs.writeFileSync('index.html', html);
     console.log('✅ Sitio generado exitosamente en index.html');
     console.log('📊 Datos cargados: ' + content.paquetes.length + ' paquetes, ' + content.beneficios.length + ' beneficios');
+    console.log('🎠 Hero slides: ' + content.hero.slides.length);
 }
 
 generateHTML();
