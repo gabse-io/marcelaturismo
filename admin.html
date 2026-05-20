@@ -24,7 +24,7 @@
         
         .editor-container { display: flex; min-height: calc(100vh - 60px); }
         .site-preview { flex: 1; background: white; overflow-y: auto; position: relative; }
-        .editor-sidebar { width: 450px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; max-height: calc(100vh - 60px); }
+        .editor-sidebar { width: 480px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; max-height: calc(100vh - 60px); }
         
         .sidebar-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f15a24; }
         .form-group { margin-bottom: 20px; }
@@ -106,6 +106,14 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentData = null;
     
+    // ========== FUNCIÓN AUXILIAR PARA COLORES ==========
+    function toHexColor(color) {
+        if (!color) return '#ffffff';
+        if (color.startsWith('#')) return color;
+        const hex = color.replace(/[^0-9a-f]/gi, '').substring(0, 6);
+        return '#' + (hex || 'ffffff');
+    }
+    
     // ========== DATOS POR DEFECTO COMPLETOS ==========
     function getDefaultData() {
         return {
@@ -132,13 +140,23 @@
                 slides: [
                     { 
                         id: 1, 
-                        badge: "🌎 viajes de autor · cupos limitados", 
+                        badge: "🔥 NUEVA TEMPORADA 2026", 
                         title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", 
                         subtitle: "Paquetes exclusivos con salidas garantizadas", 
                         backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", 
                         buttonPrimaryText: "Explorar paquetes", 
                         buttonPrimaryLink: "#paquetes", 
                         buttonSecondaryText: "Hablar por WhatsApp" 
+                    },
+                    { 
+                        id: 2, 
+                        badge: "🏔️ Destinos únicos", 
+                        title: "Descubrí <span>Mendoza & Nieve</span><br>la mejor experiencia", 
+                        subtitle: "Salidas garantizadas con los mejores precios", 
+                        backgroundImage: "https://images.unsplash.com/photo-1533105079780-92b9be482077", 
+                        buttonPrimaryText: "Ver destinos", 
+                        buttonPrimaryLink: "#paquetes", 
+                        buttonSecondaryText: "Contactar" 
                     }
                 ] 
             },
@@ -147,7 +165,77 @@
                 subtitle: "Elegí tu experiencia, nosotros nos encargamos del resto", 
                 backgroundColor: "#ffffff" 
             },
-            paquetes: [],
+            paquetes: [
+                {
+                    id: 1,
+                    nombre: "Buenos Aires Vip",
+                    precio: 199000,
+                    imagen: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3",
+                    badge: "Próxima salida",
+                    badgeColor: "#f15a24",
+                    descripcionCorta: "Salida 12 de Junio. Incluye excursiones a River, Boca, San Telmo, Luján.",
+                    descripcionCompleta: "Disfrutá de la ciudad porteña con alojamiento de lujo, city tour completo y excursiones a los estadios más emblemáticos.",
+                    ciudad: "Buenos Aires",
+                    noches: "2 noches",
+                    salida: "12 de Junio",
+                    alimentacion: "Desayuno",
+                    incluye: ["Hotel 5 estrellas Luxon", "Bus mix cama", "City tour completo", "Entradas a estadios"],
+                    itinerario: [
+                        { dia: "Día 1", titulo: "Llegada a Buenos Aires", texto: "Recepción en el aeropuerto y traslado al hotel Luxon." },
+                        { dia: "Día 2", titulo: "City Tour y estadios", texto: "Recorrido por San Telmo, La Boca, Palermo y Recoleta." }
+                    ],
+                    hoteles: [
+                        { nombre: "Luxon Hotel", imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=300&h=180&fit=crop", rating: 5, descripcion: "Hotel 5 estrellas en el centro porteño" }
+                    ],
+                    whatsapp: "Hola! Quiero reservar el paquete BUENOS AIRES VIP"
+                },
+                {
+                    id: 2,
+                    nombre: "Mendoza & Nieve",
+                    precio: 280000,
+                    imagen: "https://images.unsplash.com/photo-1533105079780-92b9be482077",
+                    badge: "Cupos reducidos",
+                    badgeColor: "#00b48a",
+                    descripcionCorta: "Salidas 30 de Abril / 22 Mayo. Desayunos, guía local, traslados.",
+                    descripcionCompleta: "Mendoza y la alta montaña. Visita a bodegas, excursión a la nieve y paisajes increíbles.",
+                    ciudad: "Mendoza",
+                    noches: "2 noches",
+                    salida: "30 de Abril / 22 Mayo",
+                    alimentacion: "Media Pension",
+                    incluye: ["Bodegas con degustación", "Excursión a la nieve", "Desayunos", "Guía local"],
+                    itinerario: [
+                        { dia: "Día 1", titulo: "Llegada y city tour", texto: "Llegada a Mendoza y visita a bodega con degustación." },
+                        { dia: "Día 2", titulo: "Alta montaña y nieve", texto: "Excursión a la Cordillera de los Andes." }
+                    ],
+                    hoteles: [
+                        { nombre: "Park Hyatt Mendoza", imagen: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=300&h=180&fit=crop", rating: 5, descripcion: "Hotel de lujo en el corazón de Mendoza" }
+                    ],
+                    whatsapp: "Hola! Quiero reservar el paquete MENDOZA & NIEVE"
+                },
+                {
+                    id: 3,
+                    nombre: "Tafí + Termas",
+                    precio: 280000,
+                    imagen: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9",
+                    badge: "Todo incluido",
+                    badgeColor: "#520968",
+                    descripcionCorta: "2 noches, Termas de Río Hondo, visitas guiadas.",
+                    descripcionCompleta: "Relajación en las Termas de Río Hondo y paisajes de Tafí del Valle.",
+                    ciudad: "Tucumán / Santiago del Estero",
+                    noches: "2 noches",
+                    salida: "Consultar fechas",
+                    alimentacion: "Pension completa",
+                    incluye: ["Termas incluidas", "Pensión completa", "Visitas guiadas", "Hotel con aguas termales"],
+                    itinerario: [
+                        { dia: "Día 1", titulo: "Llegada a Termas", texto: "Llegada a Termas de Río Hondo y alojamiento." },
+                        { dia: "Día 2", titulo: "Termas y circuito", texto: "Día completo en el complejo termal." }
+                    ],
+                    hoteles: [
+                        { nombre: "Hotel Termal Río Hondo", imagen: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=300&h=180&fit=crop", rating: 4, descripcion: "Hotel con aguas termales y spa incluido" }
+                    ],
+                    whatsapp: "Hola! Quiero reservar el paquete TAFÍ + TERMAS"
+                }
+            ],
             seccionBeneficios: { 
                 title: "¿Por qué viajar con nosotros?", 
                 backgroundColor: "#fafafc" 
@@ -164,7 +252,7 @@
                 textColor: "rgba(255,255,255,0.8)", 
                 columnas: [
                     { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }, { texto: "Política de cancelación", url: "#" }, { texto: "Medios de pago", url: "#" }] },
-                    { titulo: "Destinos", enlaces: [{ texto: "Buenos Aires", url: "#" }, { texto: "Mendoza", url: "#" }, { texto: "Termas de Río Hondo", url: "#" }, { texto: "Salta", url: "#" }] },
+                    { titulo: "Destinos", enlaces: [{ texto: "Buenos Aires", url: "#" }, { texto: "Mendoza", url: "#" }, { texto: "Termas de Río Hondo", url: "#" }, { texto: "Bariloche", url: "#" }] },
                     { titulo: "Contacto directo", enlaces: [{ texto: "WhatsApp", url: "https://wa.me/5493624331702", icono: "fab fa-whatsapp" }, { texto: "Instagram", url: "https://www.instagram.com/marcela_correa_turismo/", icono: "fab fa-instagram" }], texto: "📍 Frondizi 33 piso 2 of.4 - Resistencia, Chaco" }
                 ] 
             }
@@ -245,7 +333,7 @@
                         ${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}
                     </div>
                     <p>${p.descripcionCorta || ''}</p>
-                    <div class="btn-card">Consultar ahora →</div>
+                    <div class="btn-card">Ver detalles →</div>
                 </div>
             </div>
         `).join('');
@@ -359,6 +447,92 @@
                 slides[currentSlide].classList.add('active');
             }, currentData.hero.autoplaySpeed || 5000);
         }
+        
+        // Eventos para modales
+        document.querySelectorAll('.card-paquete').forEach(card => {
+            const id = parseInt(card.getAttribute('data-id'));
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const paquete = currentData.paquetes.find(p => p.id === id);
+                if (paquete) {
+                    mostrarModal(paquete);
+                }
+            });
+        });
+    }
+    
+    function mostrarModal(paquete) {
+        const alimentacionIcon = {
+            'No incluido': '🚫',
+            'Desayuno': '🍳',
+            'Media Pension': '🍳🍽️',
+            'Pension completa': '🍳🍽️🍷'
+        };
+        const alimentacionTexto = `${alimentacionIcon[paquete.alimentacion] || '🍳'} ${paquete.alimentacion || 'Desayuno incluido'}`;
+        
+        const modalHtml = `
+            <div id="modal-preview" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; align-items:center; justify-content:center; overflow-y:auto;">
+                <div style="max-width:900px; width:90%; background:white; border-radius:24px; overflow:hidden; max-height:90vh; overflow-y:auto;">
+                    <div style="position:relative; height:300px; background-image:url('${paquete.imagen}?w=800&h=380&fit=crop'); background-size:cover; background-position:center;">
+                        <div style="position:absolute; top:20px; right:20px;">
+                            <button onclick="document.getElementById('modal-preview').remove()" style="background:#f15a24; color:white; width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;">✕</button>
+                        </div>
+                        <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding:30px;">
+                            <h2 style="color:white; font-size:2rem; margin:0;">${paquete.nombre}</h2>
+                            <div style="color:#f15a24; font-size:1.5rem; font-weight:bold;">$${paquete.precio.toLocaleString()} <span style="font-size:0.9rem;">por persona</span></div>
+                        </div>
+                    </div>
+                    <div style="padding:30px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:20px; padding:20px 0; border-top:1px solid #eef2f5; border-bottom:1px solid #eef2f5; margin-bottom:20px;">
+                            <span><i class="fas fa-map-marker-alt" style="color:#00b48a;"></i> ${paquete.ciudad || 'No especificada'}</span>
+                            <span><i class="fas fa-bed" style="color:#00b48a;"></i> ${paquete.noches || 'No especificadas'}</span>
+                            <span><i class="fas fa-calendar-alt" style="color:#00b48a;"></i> ${paquete.salida || 'Consultar'}</span>
+                            <span><i class="fas fa-utensils" style="color:#00b48a;"></i> ${alimentacionTexto}</span>
+                        </div>
+                        <p>${paquete.descripcionCompleta || paquete.descripcionCorta || ''}</p>
+                        <h3>Qué incluye</h3>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px; margin:15px 0;">
+                            ${(paquete.incluye || []).map(i => `<span style="background:#eef2fa; padding:8px 16px; border-radius:40px; font-size:0.85rem;"><i class="fas fa-check-circle" style="color:#00b48a;"></i> ${i}</span>`).join('')}
+                        </div>
+                        <h3>Itinerario día a día</h3>
+                        ${(paquete.itinerario || []).map(item => `
+                            <div style="border:1px solid #eef2f5; border-radius:16px; margin-bottom:12px; overflow:hidden;">
+                                <div style="background:#fafafc; padding:15px 20px; cursor:pointer; font-weight:600; display:flex; justify-content:space-between;" onclick="this.nextElementSibling.classList.toggle('show'); this.querySelector('i').classList.toggle('fa-chevron-down'); this.querySelector('i').classList.toggle('fa-chevron-up');">
+                                    <span><strong>${item.dia}</strong> - ${item.titulo}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div style="padding:0 20px; max-height:0; overflow:hidden; transition:max-height 0.3s ease;">
+                                    <p style="padding:20px 0; margin:0;">${item.texto}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                        <h3>Posibles alojamientos</h3>
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
+                            ${(paquete.hoteles || []).map(hotel => `
+                                <div style="border:1px solid #eef2f5; border-radius:20px; overflow:hidden;">
+                                    <div style="height:180px; background-image:url('${hotel.imagen}'); background-size:cover; background-position:center;"></div>
+                                    <div style="padding:20px;">
+                                        <h4>${hotel.nombre}</h4>
+                                        <div style="color:#ffb800;">${'★'.repeat(hotel.rating)}${'☆'.repeat(5-hotel.rating)}</div>
+                                        <p>${hotel.descripcion}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="window.open('https://wa.me/${currentData.header.whatsappNumber}?text=${encodeURIComponent(paquete.whatsapp)}', '_blank')" style="background:#f15a24; color:white; border:none; padding:14px 40px; border-radius:60px; font-weight:700; cursor:pointer; margin-top:30px; width:100%;"><i class="fab fa-whatsapp"></i> Reservar ahora</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Activar acordeones
+        document.querySelectorAll('#modal-preview .itinerario-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('show');
+            });
+        });
     }
     
     // ========== CARGAR FORMULARIOS ==========
@@ -367,9 +541,9 @@
         document.getElementById('editor-form-general').innerHTML = `
             <h3>Configuración General</h3>
             <div class="form-group"><label>Nombre del sitio</label><input type="text" id="site-name" value="${escapeHtml(currentData.config?.siteName || '')}"></div>
-            <div class="form-group"><label>Color primario</label><input type="color" id="primary-color" value="${currentData.config?.primaryColor || '#f15a24'}"></div>
-            <div class="form-group"><label>Color secundario</label><input type="color" id="secondary-color" value="${currentData.config?.secondaryColor || '#0a2540'}"></div>
-            <div class="form-group"><label>Color acento</label><input type="color" id="accent-color" value="${currentData.config?.accentColor || '#00b48a'}"></div>
+            <div class="form-group"><label>Color primario</label><input type="color" id="primary-color" value="${toHexColor(currentData.config?.primaryColor)}"></div>
+            <div class="form-group"><label>Color secundario</label><input type="color" id="secondary-color" value="${toHexColor(currentData.config?.secondaryColor)}"></div>
+            <div class="form-group"><label>Color acento</label><input type="color" id="accent-color" value="${toHexColor(currentData.config?.accentColor)}"></div>
             <div class="form-group"><label>Fuente</label><input type="text" id="font-family" value="${currentData.config?.fontFamily || "'Inter', sans-serif"}"></div>
             <button class="btn-save" onclick="updateGeneral()">Guardar cambios</button>
         `;
@@ -382,8 +556,8 @@
             <div class="form-row"><div class="form-group"><label>Ancho logo</label><input type="text" id="logo-width" value="${currentData.header.logoWidth || '55px'}"></div><div class="form-group"><label>Alto logo</label><input type="text" id="logo-height" value="${currentData.header.logoHeight || '55px'}"></div></div>
             <div class="form-group"><label>WhatsApp número</label><input type="text" id="whatsapp-number" value="${currentData.header.whatsappNumber || ''}"></div>
             <div class="form-group"><label>Texto botón WhatsApp</label><input type="text" id="whatsapp-text" value="${currentData.header.whatsappText || 'Reservar'}"></div>
-            <div class="form-group"><label>Color fondo header</label><input type="color" id="header-bg" value="${(currentData.header.backgroundColor || 'rgba(255,255,255,0.96)').replace(/[^0-9a-f]/gi, '').substring(0,6) || 'ffffff'}"></div>
-            <div class="form-group"><label>Color texto header</label><input type="color" id="header-color" value="${(currentData.header.textColor || '#111111').replace(/[^0-9a-f]/gi, '').substring(0,6) || '111111'}"></div>
+            <div class="form-group"><label>Color fondo header</label><input type="color" id="header-bg" value="${toHexColor(currentData.header.backgroundColor)}"></div>
+            <div class="form-group"><label>Color texto header</label><input type="color" id="header-color" value="${toHexColor(currentData.header.textColor)}"></div>
             <button class="btn-save" onclick="updateHeader()">Guardar cambios</button>
         `;
         
@@ -419,12 +593,22 @@
                     <div class="slide-header"><strong>${escapeHtml(p.nombre || 'Sin nombre')}</strong><button class="btn-remove" onclick="removePaquete(${p.id})">Eliminar</button></div>
                     <div class="form-group"><label>Nombre</label><input type="text" id="paq-nombre-${p.id}" value="${escapeHtml(p.nombre || '')}"></div>
                     <div class="form-row"><div class="form-group"><label>Precio</label><input type="number" id="paq-precio-${p.id}" value="${p.precio || 0}"></div><div class="form-group"><label>Badge</label><input type="text" id="paq-badge-${p.id}" value="${escapeHtml(p.badge || '')}"></div></div>
-                    <div class="form-group"><label>Color badge</label><input type="color" id="paq-badge-color-${p.id}" value="${p.badgeColor || '#f15a24'}"></div>
+                    <div class="form-group"><label>Color badge</label><input type="color" id="paq-badge-color-${p.id}" value="${toHexColor(p.badgeColor)}"></div>
                     <div class="form-group"><label>Imagen URL</label><input type="text" id="paq-imagen-${p.id}" value="${p.imagen || ''}"><div class="image-preview" style="background-image: url('${p.imagen || ''}');"></div></div>
                     <div class="form-group"><label>Descripción corta (card)</label><textarea id="paq-descripcion-${p.id}" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea></div>
                     <div class="form-group"><label>Descripción completa (modal)</label><textarea id="paq-descripcion-completa-${p.id}" rows="3">${escapeHtml(p.descripcionCompleta || '')}</textarea></div>
                     <div class="form-row"><div class="form-group"><label>Ciudad</label><input type="text" id="paq-ciudad-${p.id}" value="${escapeHtml(p.ciudad || '')}"></div><div class="form-group"><label>Noches</label><input type="text" id="paq-noches-${p.id}" value="${escapeHtml(p.noches || '')}"></div></div>
-                    <div class="form-row"><div class="form-group"><label>Salida</label><input type="text" id="paq-salida-${p.id}" value="${escapeHtml(p.salida || '')}"></div><div class="form-group"><label>WhatsApp texto</label><input type="text" id="paq-whatsapp-${p.id}" value="${escapeHtml(p.whatsapp || '')}"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Salida</label><input type="text" id="paq-salida-${p.id}" value="${escapeHtml(p.salida || '')}"></div>
+                    <div class="form-group">
+                        <label>Alimentación</label>
+                        <select id="paq-alimentacion-${p.id}">
+                            <option value="No incluido" ${p.alimentacion === 'No incluido' ? 'selected' : ''}>🚫 No incluido</option>
+                            <option value="Desayuno" ${(!p.alimentacion || p.alimentacion === 'Desayuno') ? 'selected' : ''}>🍳 Desayuno</option>
+                            <option value="Media Pension" ${p.alimentacion === 'Media Pension' ? 'selected' : ''}>🍳🍽️ Media Pensión</option>
+                            <option value="Pension completa" ${p.alimentacion === 'Pension completa' ? 'selected' : ''}>🍳🍽️🍷 Pensión Completa</option>
+                        </select>
+                    </div></div>
+                    <div class="form-group"><label>WhatsApp texto</label><input type="text" id="paq-whatsapp-${p.id}" value="${escapeHtml(p.whatsapp || '')}"></div>
                     <div class="form-group"><label>Incluye (separado por comas)</label><input type="text" id="paq-incluye-${p.id}" value="${(p.incluye || []).join(', ')}"></div>
                     <details><summary>Itinerario (editar JSON)</summary><textarea id="paq-itinerario-${p.id}" rows="6">${JSON.stringify(p.itinerario || [], null, 2)}</textarea></details>
                     <details><summary>Hoteles (editar JSON)</summary><textarea id="paq-hoteles-${p.id}" rows="6">${JSON.stringify(p.hoteles || [], null, 2)}</textarea></details>
@@ -477,7 +661,7 @@
         document.getElementById('editor-form-footer').innerHTML = `
             <h3>Footer</h3>
             <div class="form-group"><label>Copyright</label><input type="text" id="footer-copyright" value="${escapeHtml(currentData.footer.copyright || '')}"></div>
-            <div class="form-group"><label>Color de fondo</label><input type="color" id="footer-bg" value="${(currentData.footer.backgroundColor || '#0a2540').replace(/[^0-9a-f]/gi, '').substring(0,6) || '0a2540'}"></div>
+            <div class="form-group"><label>Color de fondo</label><input type="color" id="footer-bg" value="${toHexColor(currentData.footer.backgroundColor)}"></div>
             <div id="footer-columnas-list">${footerColumnasHTML || '<p>No hay columnas</p>'}</div>
             <button class="btn-add" onclick="addFooterCol()">+ Agregar Columna</button>
             <button class="btn-save" style="margin-top:20px;" onclick="updateFooter()">Guardar cambios</button>
@@ -557,6 +741,7 @@
             p.ciudad = document.getElementById(`paq-ciudad-${p.id}`)?.value || '';
             p.noches = document.getElementById(`paq-noches-${p.id}`)?.value || '';
             p.salida = document.getElementById(`paq-salida-${p.id}`)?.value || '';
+            p.alimentacion = document.getElementById(`paq-alimentacion-${p.id}`)?.value || 'Desayuno';
             p.whatsapp = document.getElementById(`paq-whatsapp-${p.id}`)?.value || '';
             p.incluye = document.getElementById(`paq-incluye-${p.id}`)?.value.split(',').map(s => s.trim()) || [];
             try {
@@ -648,6 +833,7 @@
             ciudad: "Destino",
             noches: "2 noches",
             salida: "Próximamente",
+            alimentacion: "Desayuno",
             incluye: ["Incluye 1", "Incluye 2"],
             itinerario: [{ dia: "Día 1", titulo: "Llegada", texto: "Descripción" }],
             hoteles: [{ nombre: "Hotel Ejemplo", imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945", rating: 4, descripcion: "Descripción del hotel" }],
