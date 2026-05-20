@@ -199,6 +199,8 @@ async function generateHTML() {
         };
     });
     
+    const paquetesJson = JSON.stringify(paquetesData);
+    
     const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -386,7 +388,7 @@ async function generateHTML() {
 </div>
 
 <script>
-    const paquetes = ${JSON.stringify(paquetesData)};
+    const paquetes = ${paquetesJson};
     
     function abrirModal(id) {
         const data = paquetes[id];
@@ -394,7 +396,7 @@ async function generateHTML() {
         
         document.getElementById('modal-titulo').innerText = data.nombre;
         document.getElementById('modal-precio').innerHTML = data.precio + ' <small>por persona</small>';
-        document.getElementById('modal-hero').style.backgroundImage = `url('\${data.imagen}')`;
+        document.getElementById('modal-hero').style.backgroundImage = "url('" + data.imagen + "')";
         document.getElementById('modal-descripcion').innerText = data.descripcion;
         
         document.getElementById('modal-features').innerHTML = \`
@@ -406,7 +408,7 @@ async function generateHTML() {
         
         const itinerarioContainer = document.getElementById('modal-itinerario');
         itinerarioContainer.innerHTML = '';
-        data.itinerario.forEach((item) => {
+        data.itinerario.forEach(function(item) {
             itinerarioContainer.innerHTML += \`
                 <div class="itinerario-dia">
                     <div class="itinerario-header" onclick="toggleItinerario(this)">
@@ -422,7 +424,7 @@ async function generateHTML() {
         
         const hotelesContainer = document.getElementById('modal-hoteles');
         hotelesContainer.innerHTML = '';
-        data.hoteles.forEach(hotel => {
+        data.hoteles.forEach(function(hotel) {
             const stars = '★'.repeat(hotel.rating) + '☆'.repeat(5-hotel.rating);
             hotelesContainer.innerHTML += \`
                 <div class="hotel-card">
@@ -436,7 +438,7 @@ async function generateHTML() {
             \`;
         });
         
-        document.getElementById('modal-whatsapp').onclick = () => {
+        document.getElementById('modal-whatsapp').onclick = function() {
             window.open('${whatsappUrl}?text=' + encodeURIComponent(data.whatsapp), '_blank');
         };
         
@@ -451,7 +453,7 @@ async function generateHTML() {
     
     function toggleItinerario(element) {
         element.classList.toggle('active');
-        const content = element.nextElementSibling;
+        var content = element.nextElementSibling;
         content.classList.toggle('show');
     }
     
@@ -470,7 +472,7 @@ async function generateHTML() {
     
     fs.writeFileSync('index.html', html);
     console.log('✅ Sitio generado exitosamente en index.html');
-    console.log(`📊 Datos cargados: ${content.paquetes.length} paquetes, ${content.beneficios.length} beneficios`);
+    console.log('📊 Datos cargados: ' + content.paquetes.length + ' paquetes, ' + content.beneficios.length + ' beneficios');
 }
 
 generateHTML();
