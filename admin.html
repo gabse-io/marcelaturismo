@@ -24,14 +24,7 @@
         
         .editor-container { display: flex; min-height: calc(100vh - 60px); }
         .site-preview { flex: 1; background: white; overflow-y: auto; position: relative; }
-        .editor-sidebar { width: 420px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; max-height: calc(100vh - 60px); }
-        
-        .editable-block { position: relative; cursor: pointer; transition: all 0.2s; }
-        .editable-block:hover { outline: 2px solid #f15a24; outline-offset: 2px; }
-        .editable-block.active { outline: 3px solid #f15a24; outline-offset: 3px; background: rgba(241,90,36,0.05); }
-        
-        .edit-indicator { position: absolute; top: -10px; right: -10px; background: #f15a24; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 10; opacity: 0; transition: opacity 0.2s; }
-        .editable-block:hover .edit-indicator { opacity: 1; }
+        .editor-sidebar { width: 450px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; max-height: calc(100vh - 60px); }
         
         .sidebar-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f15a24; }
         .form-group { margin-bottom: 20px; }
@@ -39,7 +32,7 @@
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; font-size: 14px; }
         .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #f15a24; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .image-preview { width: 100%; height: 150px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+        .image-preview { width: 100%; height: 150px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; background-color: #f1f5f9; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
         .btn-add { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; margin-top: 10px; }
         .slide-item { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
@@ -54,11 +47,14 @@
         .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top-color: #f15a24; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { background: none; border: none; padding: 8px 16px; cursor: pointer; border-radius: 8px; font-weight: 500; }
         .tab-btn.active { background: #f15a24; color: white; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
+        h3 { font-size: 1rem; margin-bottom: 15px; color: #1e293b; }
+        details { margin-top: 10px; }
+        details summary { cursor: pointer; color: #f15a24; font-weight: 500; }
     </style>
 </head>
 <body>
@@ -86,147 +82,212 @@
         <div class="tab-buttons">
             <button class="tab-btn active" data-tab="general">General</button>
             <button class="tab-btn" data-tab="header">Header</button>
-            <button class="tab-btn" data-tab="hero">Hero</button>
+            <button class="tab-btn" data-tab="hero">Hero Slider</button>
             <button class="tab-btn" data-tab="paquetes">Paquetes</button>
             <button class="tab-btn" data-tab="beneficios">Beneficios</button>
             <button class="tab-btn" data-tab="footer">Footer</button>
         </div>
         
-        <div id="tab-general" class="tab-pane active">
-            <div id="editor-form-general">
-                <p style="color: #94a3b8; text-align: center;">Configuración general del sitio</p>
-            </div>
-        </div>
-        <div id="tab-header" class="tab-pane">
-            <div id="editor-form-header">
-                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
-            </div>
-        </div>
-        <div id="tab-hero" class="tab-pane">
-            <div id="editor-form-hero">
-                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
-            </div>
-        </div>
-        <div id="tab-paquetes" class="tab-pane">
-            <div id="editor-form-paquetes">
-                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
-            </div>
-        </div>
-        <div id="tab-beneficios" class="tab-pane">
-            <div id="editor-form-beneficios">
-                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
-            </div>
-        </div>
-        <div id="tab-footer" class="tab-pane">
-            <div id="editor-form-footer">
-                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
-            </div>
-        </div>
+        <div id="tab-general" class="tab-pane active"><div id="editor-form-general"></div></div>
+        <div id="tab-header" class="tab-pane"><div id="editor-form-header"></div></div>
+        <div id="tab-hero" class="tab-pane"><div id="editor-form-hero"></div></div>
+        <div id="tab-paquetes" class="tab-pane"><div id="editor-form-paquetes"></div></div>
+        <div id="tab-beneficios" class="tab-pane"><div id="editor-form-beneficios"></div></div>
+        <div id="tab-footer" class="tab-pane"><div id="editor-form-footer"></div></div>
     </div>
 </div>
 
 <script>
-    // Configuración
+    // ========== CONFIGURACIÓN ==========
     const SUPABASE_URL = 'https://fwqojlaepsfbbbwwguwd.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
     const VERCEL_WEBHOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_TU_PROYECTO/TU_TOKEN';
     
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
     let currentData = null;
     
-    async function loadData() {
-        const { data, error } = await supabaseClient
-            .from('website_content')
-            .select('contenido')
-            .eq('id', 1)
-            .single();
-        
-        if (data && data.contenido) {
-            currentData = data.contenido;
-        } else {
-            currentData = getDefaultData();
-        }
-        
-        renderSite();
-        loadForms();
-    }
-    
+    // ========== DATOS POR DEFECTO COMPLETOS ==========
     function getDefaultData() {
         return {
-            config: { siteName: "Marcela Correa Turismo", primaryColor: "#f15a24", secondaryColor: "#0a2540", accentColor: "#00b48a", fontFamily: "'Inter', sans-serif" },
-            header: { logoText: "marcela<br><span>correa</span> turismo", logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", logoWidth: "55px", logoHeight: "55px", whatsappNumber: "5493624331702", whatsappText: "Reservar", backgroundColor: "rgba(255,255,255,0.96)", textColor: "#111111" },
-            hero: { enabled: true, autoplaySpeed: 5000, slides: [{ id: 1, badge: "🌎 viajes de autor", title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", subtitle: "Paquetes exclusivos", backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", buttonPrimaryText: "Explorar", buttonPrimaryLink: "#paquetes", buttonSecondaryText: "WhatsApp" }] },
-            seccionPaquetes: { title: "Próximas <span style=\"color: #f15a24;\">salidas</span>", subtitle: "Elegí tu experiencia, nosotros nos encargamos del resto", backgroundColor: "#ffffff" },
+            config: { 
+                siteName: "Marcela Correa Turismo", 
+                primaryColor: "#f15a24", 
+                secondaryColor: "#0a2540", 
+                accentColor: "#00b48a", 
+                fontFamily: "'Inter', sans-serif" 
+            },
+            header: { 
+                logoText: "marcela<br><span>correa</span> turismo", 
+                logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", 
+                logoWidth: "55px", 
+                logoHeight: "55px", 
+                whatsappNumber: "5493624331702", 
+                whatsappText: "Reservar", 
+                backgroundColor: "rgba(255,255,255,0.96)", 
+                textColor: "#111111" 
+            },
+            hero: { 
+                enabled: true, 
+                autoplaySpeed: 5000, 
+                slides: [
+                    { 
+                        id: 1, 
+                        badge: "🌎 viajes de autor · cupos limitados", 
+                        title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", 
+                        subtitle: "Paquetes exclusivos con salidas garantizadas", 
+                        backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", 
+                        buttonPrimaryText: "Explorar paquetes", 
+                        buttonPrimaryLink: "#paquetes", 
+                        buttonSecondaryText: "Hablar por WhatsApp" 
+                    }
+                ] 
+            },
+            seccionPaquetes: { 
+                title: "Próximas <span style=\"color: #f15a24;\">salidas</span>", 
+                subtitle: "Elegí tu experiencia, nosotros nos encargamos del resto", 
+                backgroundColor: "#ffffff" 
+            },
             paquetes: [],
-            seccionBeneficios: { title: "¿Por qué viajar con nosotros?", backgroundColor: "#fafafc" },
-            beneficios: [],
-            footer: { copyright: "© 2026 Marcela Correa Turismo", backgroundColor: "#0a2540", textColor: "rgba(255,255,255,0.8)", columnas: [] }
+            seccionBeneficios: { 
+                title: "¿Por qué viajar con nosotros?", 
+                backgroundColor: "#fafafc" 
+            },
+            beneficios: [
+                { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles y buses de primera línea" },
+                { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente en destino" },
+                { icono: "fa-credit-card", titulo: "Pago flexible", descripcion: "Tarjetas, efectivo, transferencia" },
+                { icono: "fa-map-pin", titulo: "Salidas garantizadas", descripcion: "Desde Resistencia, Corrientes y Villa Angela" }
+            ],
+            footer: { 
+                copyright: "© 2026 Marcela Correa Turismo · #HacemosRealidadTuViaje", 
+                backgroundColor: "#0a2540", 
+                textColor: "rgba(255,255,255,0.8)", 
+                columnas: [
+                    { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }, { texto: "Política de cancelación", url: "#" }, { texto: "Medios de pago", url: "#" }] },
+                    { titulo: "Destinos", enlaces: [{ texto: "Buenos Aires", url: "#" }, { texto: "Mendoza", url: "#" }, { texto: "Termas de Río Hondo", url: "#" }, { texto: "Salta", url: "#" }] },
+                    { titulo: "Contacto directo", enlaces: [{ texto: "WhatsApp", url: "https://wa.me/5493624331702", icono: "fab fa-whatsapp" }, { texto: "Instagram", url: "https://www.instagram.com/marcela_correa_turismo/", icono: "fab fa-instagram" }], texto: "📍 Frondizi 33 piso 2 of.4 - Resistencia, Chaco" }
+                ] 
+            }
         };
     }
     
+    // ========== CARGAR DATOS ==========
+    async function loadData() {
+        try {
+            const { data, error } = await supabaseClient
+                .from('website_content')
+                .select('contenido')
+                .eq('id', 1)
+                .single();
+            
+            if (error || !data || !data.contenido) {
+                console.log('Usando datos por defecto');
+                currentData = getDefaultData();
+            } else {
+                currentData = data.contenido;
+                // Asegurar que todas las propiedades existan
+                if (!currentData.config) currentData.config = getDefaultData().config;
+                if (!currentData.header) currentData.header = getDefaultData().header;
+                if (!currentData.hero) currentData.hero = getDefaultData().hero;
+                if (!currentData.hero.slides) currentData.hero.slides = getDefaultData().hero.slides;
+                if (!currentData.seccionPaquetes) currentData.seccionPaquetes = getDefaultData().seccionPaquetes;
+                if (!currentData.paquetes) currentData.paquetes = [];
+                if (!currentData.seccionBeneficios) currentData.seccionBeneficios = getDefaultData().seccionBeneficios;
+                if (!currentData.beneficios) currentData.beneficios = getDefaultData().beneficios;
+                if (!currentData.footer) currentData.footer = getDefaultData().footer;
+                if (!currentData.footer.columnas) currentData.footer.columnas = [];
+            }
+            
+            renderSite();
+            loadForms();
+        } catch (err) {
+            console.error('Error loading data:', err);
+            currentData = getDefaultData();
+            renderSite();
+            loadForms();
+        }
+    }
+    
+    // ========== RENDERIZAR SITIO ==========
     function renderSite() {
         const preview = document.getElementById('site-preview');
-        const whatsappUrl = `https://wa.me/${currentData.header.whatsappNumber}`;
+        if (!currentData) return;
         
+        const whatsappUrl = `https://wa.me/${currentData.header.whatsappNumber}`;
+        const primaryColor = currentData.config?.primaryColor || '#f15a24';
+        
+        // Hero slides
         const heroSlidesHTML = (currentData.hero.slides || []).map((slide, idx) => `
             <div class="hero-slide ${idx === 0 ? 'active' : ''}">
-                <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${slide.backgroundImage}'); background-size: cover;">
+                <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${slide.backgroundImage || ''}'); background-size: cover;">
                     <div class="container">
-                        <div class="hero-badge">${slide.badge}</div>
-                        <h1>${slide.title}</h1>
-                        <p>${slide.subtitle}</p>
+                        <div class="hero-badge">${slide.badge || ''}</div>
+                        <h1>${slide.title || ''}</h1>
+                        <p>${slide.subtitle || ''}</p>
                         <div class="hero-buttons">
-                            <a href="${slide.buttonPrimaryLink}" class="btn-primary">${slide.buttonPrimaryText}</a>
-                            <a href="${whatsappUrl}" class="btn-outline">${slide.buttonSecondaryText}</a>
+                            <a href="${slide.buttonPrimaryLink || '#'}" class="btn-primary">${slide.buttonPrimaryText || 'Explorar'}</a>
+                            <a href="${whatsappUrl}" class="btn-outline">${slide.buttonSecondaryText || 'WhatsApp'}</a>
                         </div>
                     </div>
                 </section>
             </div>
         `).join('');
         
+        // Paquetes
         const paquetesHTML = (currentData.paquetes || []).map(p => `
             <div class="card-paquete" data-id="${p.id}">
-                <div class="card-img" style="background-image: url('${p.imagen}?w=500&h=260&fit=crop');"></div>
+                <div class="card-img" style="background-image: url('${p.imagen || ''}?w=500&h=260&fit=crop');"></div>
                 <div class="card-content">
-                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge}</div>
-                    <h3 class="card-title">${p.nombre}</h3>
+                    <div class="badge" style="background: ${p.badgeColor || primaryColor}">${p.badge || 'Destino'}</div>
+                    <h3 class="card-title">${p.nombre || 'Sin nombre'}</h3>
                     <div class="price">$${(p.precio || 0).toLocaleString()} <small>pp</small></div>
-                    <div class="features">${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}</div>
+                    <div class="features">
+                        ${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}
+                    </div>
                     <p>${p.descripcionCorta || ''}</p>
                     <div class="btn-card">Consultar ahora →</div>
                 </div>
             </div>
         `).join('');
         
+        // Beneficios
         const beneficiosHTML = (currentData.beneficios || []).map(b => `
             <div class="benefit">
-                <i class="fas ${b.icono}"></i>
-                <h4>${b.titulo}</h4>
-                <p>${b.descripcion}</p>
+                <i class="fas ${b.icono || 'fa-star'}"></i>
+                <h4>${b.titulo || ''}</h4>
+                <p>${b.descripcion || ''}</p>
             </div>
         `).join('');
         
-        preview.innerHTML = `
+        // Footer columnas
+        const footerColumnasHTML = (currentData.footer.columnas || []).map(col => `
+            <div class="footer-col">
+                <h4>${col.titulo || ''}</h4>
+                ${(col.enlaces || []).map(link => `<a href="${link.url || '#'}" target="_blank"><i class="${link.icono || ''}"></i> ${link.texto || ''}</a>`).join('')}
+                ${col.texto ? `<p>${col.texto}</p>` : ''}
+            </div>
+        `).join('');
+        
+        const html = `
             <style>
                 * { margin:0; padding:0; box-sizing:border-box; }
-                body { font-family: 'Inter', sans-serif; }
+                body { font-family: ${currentData.config?.fontFamily || "'Inter', sans-serif"}; background:#fff; }
                 .container { max-width:1400px; margin:0 auto; padding:0 40px; }
-                .main-header { position:sticky; top:0; background:${currentData.header.backgroundColor}; backdrop-filter:blur(8px); border-bottom:1px solid #eef2f5; z-index:100; }
+                .main-header { position:sticky; top:0; background:${currentData.header.backgroundColor || 'rgba(255,255,255,0.96)'}; backdrop-filter:blur(8px); border-bottom:1px solid #eef2f5; z-index:100; }
                 .header-top { display:flex; justify-content:space-between; align-items:center; padding:20px 0; flex-wrap:wrap; }
                 .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
-                .logo-icon img { width:${currentData.header.logoWidth}; height:${currentData.header.logoHeight}; border-radius:12px; object-fit:cover; }
-                .logo-text { font-weight:800; font-size:1.2rem; color:${currentData.header.textColor}; }
-                .logo-text span { color:#f15a24; }
-                .btn-wa { background:#f15a24; padding:10px 24px; border-radius:40px; text-decoration:none; color:white; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
+                .logo-icon img { width:${currentData.header.logoWidth || '55px'}; height:${currentData.header.logoHeight || '55px'}; border-radius:12px; object-fit:cover; }
+                .logo-text { font-weight:800; font-size:1.2rem; color:${currentData.header.textColor || '#111'}; }
+                .logo-text span { color:${primaryColor}; }
+                .btn-wa { background:${primaryColor}; padding:10px 24px; border-radius:40px; text-decoration:none; color:white; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
                 .hero { padding:140px 0; color:white; text-align:center; background-size:cover !important; }
                 .hero h1 { font-size:4.2rem; font-weight:800; margin-bottom:20px; }
-                .hero h1 span { color:#f15a24; }
+                .hero h1 span { color:${primaryColor}; }
                 .hero p { font-size:1.2rem; max-width:600px; margin:0 auto 32px; }
-                .hero-buttons { display:flex; gap:20px; justify-content:center; }
-                .btn-primary { background:#f15a24; padding:14px 36px; border-radius:60px; text-decoration:none; color:white; font-weight:600; display:inline-flex; gap:8px; }
+                .hero-buttons { display:flex; gap:20px; justify-content:center; flex-wrap:wrap; }
+                .btn-primary { background:${primaryColor}; padding:14px 36px; border-radius:60px; text-decoration:none; color:white; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
                 .btn-outline { background:transparent; border:1px solid white; padding:12px 32px; border-radius:60px; text-decoration:none; color:white; font-weight:500; }
-                .paquetes { padding:100px 0; background:${currentData.seccionPaquetes.backgroundColor}; }
+                .paquetes { padding:100px 0; background:${currentData.seccionPaquetes.backgroundColor || '#fff'}; }
                 .section-title { font-size:3rem; font-weight:800; text-align:center; margin-bottom:16px; }
                 .section-sub { text-align:center; color:#5b6e8c; margin-bottom:64px; }
                 .paquetes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:40px; }
@@ -235,36 +296,77 @@
                 .card-img { height:240px; background-size:cover; background-position:center; }
                 .card-content { padding:28px 24px; }
                 .card-title { font-size:1.6rem; font-weight:700; margin-bottom:8px; }
-                .price { font-size:2rem; font-weight:800; color:#f15a24; margin:16px 0; }
-                .badge { display:inline-block; background:#f15a24; color:white; font-size:0.7rem; font-weight:700; padding:4px 12px; border-radius:50px; margin-bottom:12px; }
+                .price { font-size:2rem; font-weight:800; color:${primaryColor}; margin:16px 0; }
+                .badge { display:inline-block; background:${primaryColor}; color:white; font-size:0.7rem; font-weight:700; padding:4px 12px; border-radius:50px; margin-bottom:12px; }
                 .features { display:flex; flex-wrap:wrap; gap:16px; margin:20px 0; font-size:0.85rem; color:#5b6e8c; border-top:1px solid #eef2f5; padding-top:20px; }
                 .features i { color:#00b48a; margin-right:6px; }
                 .btn-card { background:#eef2fa; border:none; padding:14px; border-radius:40px; font-weight:600; cursor:pointer; width:100%; text-align:center; }
-                .benefits { background:${currentData.seccionBeneficios.backgroundColor}; padding:80px 0; }
+                .benefits { background:${currentData.seccionBeneficios.backgroundColor || '#fafafc'}; padding:80px 0; }
                 .benefits-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:40px; text-align:center; }
-                .benefit i { font-size:2rem; color:#f15a24; margin-bottom:20px; }
-                .footer { background:${currentData.footer.backgroundColor}; color:${currentData.footer.textColor}; padding:60px 0 30px; }
+                .benefit i { font-size:2rem; color:${primaryColor}; margin-bottom:20px; }
+                .benefit h4 { font-size:1.2rem; margin-bottom:10px; }
+                .footer { background:${currentData.footer.backgroundColor || '#0a2540'}; color:${currentData.footer.textColor || 'rgba(255,255,255,0.8)'}; padding:60px 0 30px; }
                 .footer-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:40px; }
                 .footer-col h4 { color:white; margin-bottom:20px; }
                 .footer-col a { display:block; color:rgba(255,255,255,0.7); text-decoration:none; margin-bottom:12px; }
                 .footer-bottom { text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); }
                 .hero-slide { display:none; }
-                .hero-slide.active { display:block; }
+                .hero-slide.active { display:block; animation:fadeIn 0.5s; }
+                @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
                 @media (max-width:768px) { .hero h1 { font-size:2.2rem; } .paquetes-grid { grid-template-columns:1fr; } .benefits-grid { grid-template-columns:1fr; } .container { padding:0 24px; } }
             </style>
-            <header class="main-header"><div class="container header-top"><a href="#" class="logo"><div class="logo-icon"><img src="${currentData.header.logoImage}"></div><div class="logo-text">${currentData.header.logoText}</div></a><a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> ${currentData.header.whatsappText}</a></div></header>
+            <header class="main-header">
+                <div class="container header-top">
+                    <a href="#" class="logo">
+                        <div class="logo-icon"><img src="${currentData.header.logoImage || ''}"></div>
+                        <div class="logo-text">${currentData.header.logoText || 'Marcela Correa'}</div>
+                    </a>
+                    <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> ${currentData.header.whatsappText || 'Reservar'}</a>
+                </div>
+            </header>
             <div class="hero-slider">${heroSlidesHTML}</div>
-            <section class="paquetes"><div class="container"><h2 class="section-title">${currentData.seccionPaquetes.title}</h2><div class="section-sub">${currentData.seccionPaquetes.subtitle}</div><div class="paquetes-grid">${paquetesHTML}</div></div></section>
-            <section class="benefits"><div class="container"><h2 class="section-title">${currentData.seccionBeneficios.title}</h2><div class="benefits-grid">${beneficiosHTML}</div></div></section>
-            <footer class="footer"><div class="container"><div class="footer-grid">${(currentData.footer.columnas || []).map(col => `<div class="footer-col"><h4>${col.titulo}</h4>${(col.enlaces || []).map(link => `<a href="${link.url}">${link.texto}</a>`).join('')}</div>`).join('')}</div><div class="footer-bottom"><p>${currentData.footer.copyright}</p></div></div></footer>
+            <section class="paquetes">
+                <div class="container">
+                    <h2 class="section-title">${currentData.seccionPaquetes.title || 'Próximas salidas'}</h2>
+                    <div class="section-sub">${currentData.seccionPaquetes.subtitle || ''}</div>
+                    <div class="paquetes-grid">${paquetesHTML || '<p style="text-align:center">No hay paquetes. Agrega uno desde el editor.</p>'}</div>
+                </div>
+            </section>
+            <section class="benefits">
+                <div class="container">
+                    <h2 class="section-title">${currentData.seccionBeneficios.title || 'Beneficios'}</h2>
+                    <div class="benefits-grid">${beneficiosHTML}</div>
+                </div>
+            </section>
+            <footer class="footer">
+                <div class="container">
+                    <div class="footer-grid">${footerColumnasHTML}</div>
+                    <div class="footer-bottom"><p>${currentData.footer.copyright || ''}</p></div>
+                </div>
+            </footer>
         `;
+        
+        preview.innerHTML = html;
+        
+        // Inicializar slider
+        let currentSlide = 0;
+        const slides = preview.querySelectorAll('.hero-slide');
+        const slideCount = slides.length;
+        if (slideCount > 1) {
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slideCount;
+                slides[currentSlide].classList.add('active');
+            }, currentData.hero.autoplaySpeed || 5000);
+        }
     }
     
+    // ========== CARGAR FORMULARIOS ==========
     function loadForms() {
-        // Formulario General
+        // General
         document.getElementById('editor-form-general').innerHTML = `
-            <h3><i class="fas fa-cog"></i> Configuración General</h3>
-            <div class="form-group"><label>Nombre del sitio</label><input type="text" id="site-name" value="${currentData.config?.siteName || ''}"></div>
+            <h3>Configuración General</h3>
+            <div class="form-group"><label>Nombre del sitio</label><input type="text" id="site-name" value="${escapeHtml(currentData.config?.siteName || '')}"></div>
             <div class="form-group"><label>Color primario</label><input type="color" id="primary-color" value="${currentData.config?.primaryColor || '#f15a24'}"></div>
             <div class="form-group"><label>Color secundario</label><input type="color" id="secondary-color" value="${currentData.config?.secondaryColor || '#0a2540'}"></div>
             <div class="form-group"><label>Color acento</label><input type="color" id="accent-color" value="${currentData.config?.accentColor || '#00b48a'}"></div>
@@ -272,59 +374,58 @@
             <button class="btn-save" onclick="updateGeneral()">Guardar cambios</button>
         `;
         
-        // Formulario Header
+        // Header
         document.getElementById('editor-form-header').innerHTML = `
-            <h3><i class="fas fa-heading"></i> Configuración del Header</h3>
-            <div class="form-group"><label>Texto del logo</label><input type="text" id="logo-text" value="${escapeHtml(currentData.header.logoText)}"></div>
-            <div class="form-group"><label>URL del logo</label><input type="text" id="logo-image" value="${currentData.header.logoImage}"><div class="image-preview" style="background-image: url('${currentData.header.logoImage}');"></div></div>
-            <div class="form-row"><div class="form-group"><label>Ancho logo</label><input type="text" id="logo-width" value="${currentData.header.logoWidth}"></div><div class="form-group"><label>Alto logo</label><input type="text" id="logo-height" value="${currentData.header.logoHeight}"></div></div>
-            <div class="form-group"><label>WhatsApp número</label><input type="text" id="whatsapp-number" value="${currentData.header.whatsappNumber}"></div>
-            <div class="form-group"><label>Texto botón WhatsApp</label><input type="text" id="whatsapp-text" value="${currentData.header.whatsappText}"></div>
-            <div class="form-group"><label>Color de fondo header</label><input type="color" id="header-bg" value="${currentData.header.backgroundColor.replace(/[^0-9a-f]/gi, '') || 'ffffff'}"></div>
-            <div class="form-group"><label>Color texto header</label><input type="color" id="header-color" value="${currentData.header.textColor.replace(/[^0-9a-f]/gi, '') || '111111'}"></div>
+            <h3>Configuración del Header</h3>
+            <div class="form-group"><label>Texto del logo (permite HTML)</label><input type="text" id="logo-text" value="${escapeHtml(currentData.header.logoText || '')}"></div>
+            <div class="form-group"><label>URL del logo</label><input type="text" id="logo-image" value="${currentData.header.logoImage || ''}"><div class="image-preview" style="background-image: url('${currentData.header.logoImage || ''}');"></div></div>
+            <div class="form-row"><div class="form-group"><label>Ancho logo</label><input type="text" id="logo-width" value="${currentData.header.logoWidth || '55px'}"></div><div class="form-group"><label>Alto logo</label><input type="text" id="logo-height" value="${currentData.header.logoHeight || '55px'}"></div></div>
+            <div class="form-group"><label>WhatsApp número</label><input type="text" id="whatsapp-number" value="${currentData.header.whatsappNumber || ''}"></div>
+            <div class="form-group"><label>Texto botón WhatsApp</label><input type="text" id="whatsapp-text" value="${currentData.header.whatsappText || 'Reservar'}"></div>
+            <div class="form-group"><label>Color fondo header</label><input type="color" id="header-bg" value="${(currentData.header.backgroundColor || 'rgba(255,255,255,0.96)').replace(/[^0-9a-f]/gi, '').substring(0,6) || 'ffffff'}"></div>
+            <div class="form-group"><label>Color texto header</label><input type="color" id="header-color" value="${(currentData.header.textColor || '#111111').replace(/[^0-9a-f]/gi, '').substring(0,6) || '111111'}"></div>
             <button class="btn-save" onclick="updateHeader()">Guardar cambios</button>
         `;
         
-        // Formulario Hero (múltiples slides)
+        // Hero Slider
         let slidesHTML = '';
         (currentData.hero.slides || []).forEach((slide, idx) => {
             slidesHTML += `
                 <div class="slide-item">
                     <div class="slide-header"><strong>Slide ${idx + 1}</strong><button class="btn-remove" onclick="removeHeroSlide(${idx})">Eliminar</button></div>
-                    <div class="form-group"><label>Badge</label><input type="text" id="hero-badge-${idx}" value="${escapeHtml(slide.badge)}"></div>
-                    <div class="form-group"><label>Título</label><textarea id="hero-title-${idx}" rows="2">${escapeHtml(slide.title)}</textarea></div>
-                    <div class="form-group"><label>Subtítulo</label><textarea id="hero-subtitle-${idx}" rows="2">${escapeHtml(slide.subtitle)}</textarea></div>
-                    <div class="form-group"><label>Imagen URL</label><input type="text" id="hero-image-${idx}" value="${slide.backgroundImage}"><div class="image-preview" style="background-image: url('${slide.backgroundImage}');"></div></div>
-                    <div class="form-row"><div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary-${idx}" value="${slide.buttonPrimaryText}"></div><div class="form-group"><label>Link</label><input type="text" id="hero-btn-link-${idx}" value="${slide.buttonPrimaryLink}"></div></div>
-                    <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary-${idx}" value="${slide.buttonSecondaryText}"></div>
+                    <div class="form-group"><label>Badge</label><input type="text" id="hero-badge-${idx}" value="${escapeHtml(slide.badge || '')}"></div>
+                    <div class="form-group"><label>Título</label><textarea id="hero-title-${idx}" rows="2">${escapeHtml(slide.title || '')}</textarea></div>
+                    <div class="form-group"><label>Subtítulo</label><textarea id="hero-subtitle-${idx}" rows="2">${escapeHtml(slide.subtitle || '')}</textarea></div>
+                    <div class="form-group"><label>Imagen URL</label><input type="text" id="hero-image-${idx}" value="${slide.backgroundImage || ''}"><div class="image-preview" style="background-image: url('${slide.backgroundImage || ''}');"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary-${idx}" value="${escapeHtml(slide.buttonPrimaryText || '')}"></div><div class="form-group"><label>Link</label><input type="text" id="hero-btn-link-${idx}" value="${slide.buttonPrimaryLink || '#'}"></div></div>
+                    <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary-${idx}" value="${escapeHtml(slide.buttonSecondaryText || '')}"></div>
                 </div>
             `;
         });
         
         document.getElementById('editor-form-hero').innerHTML = `
-            <h3><i class="fas fa-images"></i> Slider del Hero</h3>
+            <h3>Slider del Hero</h3>
             <div class="form-group"><label>Autoplay speed (ms)</label><input type="number" id="autoplay-speed" value="${currentData.hero.autoplaySpeed || 5000}"></div>
             <div id="hero-slides-container">${slidesHTML}</div>
             <button class="btn-add" onclick="addHeroSlide()">+ Agregar Slide</button>
             <button class="btn-save" style="margin-top:20px;" onclick="updateHero()">Guardar cambios</button>
         `;
         
-        // Formulario Paquetes
+        // Paquetes
         let paquetesHTML = '';
         (currentData.paquetes || []).forEach((p, idx) => {
             paquetesHTML += `
                 <div class="slide-item">
-                    <div class="slide-header"><strong>${p.nombre}</strong><button class="btn-remove" onclick="removePaquete(${p.id})">Eliminar</button></div>
-                    <div class="form-group"><label>Nombre</label><input type="text" id="paq-nombre-${p.id}" value="${escapeHtml(p.nombre)}"></div>
-                    <div class="form-row"><div class="form-group"><label>Precio</label><input type="number" id="paq-precio-${p.id}" value="${p.precio}"></div><div class="form-group"><label>Badge</label><input type="text" id="paq-badge-${p.id}" value="${p.badge}"></div></div>
+                    <div class="slide-header"><strong>${escapeHtml(p.nombre || 'Sin nombre')}</strong><button class="btn-remove" onclick="removePaquete(${p.id})">Eliminar</button></div>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="paq-nombre-${p.id}" value="${escapeHtml(p.nombre || '')}"></div>
+                    <div class="form-row"><div class="form-group"><label>Precio</label><input type="number" id="paq-precio-${p.id}" value="${p.precio || 0}"></div><div class="form-group"><label>Badge</label><input type="text" id="paq-badge-${p.id}" value="${escapeHtml(p.badge || '')}"></div></div>
                     <div class="form-group"><label>Color badge</label><input type="color" id="paq-badge-color-${p.id}" value="${p.badgeColor || '#f15a24'}"></div>
-                    <div class="form-group"><label>Imagen URL</label><input type="text" id="paq-imagen-${p.id}" value="${p.imagen}"><div class="image-preview" style="background-image: url('${p.imagen}');"></div></div>
-                    <div class="form-group"><label>Descripción corta</label><textarea id="paq-descripcion-${p.id}" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea></div>
+                    <div class="form-group"><label>Imagen URL</label><input type="text" id="paq-imagen-${p.id}" value="${p.imagen || ''}"><div class="image-preview" style="background-image: url('${p.imagen || ''}');"></div></div>
+                    <div class="form-group"><label>Descripción corta (card)</label><textarea id="paq-descripcion-${p.id}" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea></div>
                     <div class="form-group"><label>Descripción completa (modal)</label><textarea id="paq-descripcion-completa-${p.id}" rows="3">${escapeHtml(p.descripcionCompleta || '')}</textarea></div>
-                    <div class="form-group"><label>Ciudad</label><input type="text" id="paq-ciudad-${p.id}" value="${p.ciudad || ''}"></div>
-                    <div class="form-row"><div class="form-group"><label>Noches</label><input type="text" id="paq-noches-${p.id}" value="${p.noches || ''}"></div><div class="form-group"><label>Salida</label><input type="text" id="paq-salida-${p.id}" value="${p.salida || ''}"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Ciudad</label><input type="text" id="paq-ciudad-${p.id}" value="${escapeHtml(p.ciudad || '')}"></div><div class="form-group"><label>Noches</label><input type="text" id="paq-noches-${p.id}" value="${escapeHtml(p.noches || '')}"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Salida</label><input type="text" id="paq-salida-${p.id}" value="${escapeHtml(p.salida || '')}"></div><div class="form-group"><label>WhatsApp texto</label><input type="text" id="paq-whatsapp-${p.id}" value="${escapeHtml(p.whatsapp || '')}"></div></div>
                     <div class="form-group"><label>Incluye (separado por comas)</label><input type="text" id="paq-incluye-${p.id}" value="${(p.incluye || []).join(', ')}"></div>
-                    <div class="form-group"><label>WhatsApp texto</label><input type="text" id="paq-whatsapp-${p.id}" value="${p.whatsapp || ''}"></div>
                     <details><summary>Itinerario (editar JSON)</summary><textarea id="paq-itinerario-${p.id}" rows="6">${JSON.stringify(p.itinerario || [], null, 2)}</textarea></details>
                     <details><summary>Hoteles (editar JSON)</summary><textarea id="paq-hoteles-${p.id}" rows="6">${JSON.stringify(p.hoteles || [], null, 2)}</textarea></details>
                 </div>
@@ -332,78 +433,88 @@
         });
         
         document.getElementById('editor-form-paquetes').innerHTML = `
-            <h3><i class="fas fa-box"></i> Paquetes Turísticos</h3>
-            <div class="form-group"><label>Título sección</label><input type="text" id="paquetes-title" value="${escapeHtml(currentData.seccionPaquetes.title)}"></div>
-            <div class="form-group"><label>Subtítulo sección</label><input type="text" id="paquetes-subtitle" value="${escapeHtml(currentData.seccionPaquetes.subtitle)}"></div>
-            <div id="paquetes-list">${paquetesHTML}</div>
+            <h3>Paquetes Turísticos</h3>
+            <div class="form-group"><label>Título sección</label><input type="text" id="paquetes-title" value="${escapeHtml(currentData.seccionPaquetes.title || '')}"></div>
+            <div class="form-group"><label>Subtítulo sección</label><input type="text" id="paquetes-subtitle" value="${escapeHtml(currentData.seccionPaquetes.subtitle || '')}"></div>
+            <div id="paquetes-list">${paquetesHTML || '<p>No hay paquetes</p>'}</div>
             <button class="btn-add" onclick="addPaquete()">+ Agregar Paquete</button>
             <button class="btn-save" style="margin-top:20px;" onclick="updatePaquetes()">Guardar cambios</button>
         `;
         
-        // Formulario Beneficios
+        // Beneficios
         let beneficiosHTML = '';
         (currentData.beneficios || []).forEach((b, idx) => {
             beneficiosHTML += `
                 <div class="slide-item">
-                    <div class="slide-header"><strong>${b.titulo}</strong><button class="btn-remove" onclick="removeBeneficio(${idx})">Eliminar</button></div>
-                    <div class="form-group"><label>Icono</label><input type="text" id="ben-icono-${idx}" value="${b.icono}"></div>
-                    <div class="form-group"><label>Título</label><input type="text" id="ben-titulo-${idx}" value="${escapeHtml(b.titulo)}"></div>
-                    <div class="form-group"><label>Descripción</label><input type="text" id="ben-descripcion-${idx}" value="${escapeHtml(b.descripcion)}"></div>
+                    <div class="slide-header"><strong>${escapeHtml(b.titulo || '')}</strong><button class="btn-remove" onclick="removeBeneficio(${idx})">Eliminar</button></div>
+                    <div class="form-group"><label>Icono (clase FA)</label><input type="text" id="ben-icono-${idx}" value="${b.icono || 'fa-star'}"></div>
+                    <div class="form-group"><label>Título</label><input type="text" id="ben-titulo-${idx}" value="${escapeHtml(b.titulo || '')}"></div>
+                    <div class="form-group"><label>Descripción</label><input type="text" id="ben-descripcion-${idx}" value="${escapeHtml(b.descripcion || '')}"></div>
                 </div>
             `;
         });
         
         document.getElementById('editor-form-beneficios').innerHTML = `
-            <h3><i class="fas fa-gem"></i> Beneficios</h3>
-            <div class="form-group"><label>Título sección</label><input type="text" id="beneficios-title" value="${escapeHtml(currentData.seccionBeneficios.title)}"></div>
-            <div id="beneficios-list">${beneficiosHTML}</div>
+            <h3>Beneficios</h3>
+            <div class="form-group"><label>Título sección</label><input type="text" id="beneficios-title" value="${escapeHtml(currentData.seccionBeneficios.title || '')}"></div>
+            <div id="beneficios-list">${beneficiosHTML || '<p>No hay beneficios</p>'}</div>
             <button class="btn-add" onclick="addBeneficio()">+ Agregar Beneficio</button>
             <button class="btn-save" style="margin-top:20px;" onclick="updateBeneficios()">Guardar cambios</button>
         `;
         
-        // Formulario Footer
+        // Footer
         let footerColumnasHTML = '';
         (currentData.footer.columnas || []).forEach((col, idx) => {
             footerColumnasHTML += `
                 <div class="slide-item">
-                    <div class="slide-header"><strong>${col.titulo}</strong><button class="btn-remove" onclick="removeFooterCol(${idx})">Eliminar</button></div>
-                    <div class="form-group"><label>Título columna</label><input type="text" id="footer-titulo-${idx}" value="${escapeHtml(col.titulo)}"></div>
+                    <div class="slide-header"><strong>${escapeHtml(col.titulo || '')}</strong><button class="btn-remove" onclick="removeFooterCol(${idx})">Eliminar</button></div>
+                    <div class="form-group"><label>Título columna</label><input type="text" id="footer-titulo-${idx}" value="${escapeHtml(col.titulo || '')}"></div>
                     <div class="form-group"><label>Enlaces (JSON)</label><textarea id="footer-enlaces-${idx}" rows="6">${JSON.stringify(col.enlaces || [], null, 2)}</textarea></div>
                 </div>
             `;
         });
         
         document.getElementById('editor-form-footer').innerHTML = `
-            <h3><i class="fas fa-globe"></i> Footer</h3>
-            <div class="form-group"><label>Copyright</label><input type="text" id="footer-copyright" value="${escapeHtml(currentData.footer.copyright)}"></div>
-            <div class="form-group"><label>Color de fondo</label><input type="color" id="footer-bg" value="${currentData.footer.backgroundColor?.replace(/[^0-9a-f]/gi, '') || '0a2540'}"></div>
-            <div id="footer-columnas-list">${footerColumnasHTML}</div>
+            <h3>Footer</h3>
+            <div class="form-group"><label>Copyright</label><input type="text" id="footer-copyright" value="${escapeHtml(currentData.footer.copyright || '')}"></div>
+            <div class="form-group"><label>Color de fondo</label><input type="color" id="footer-bg" value="${(currentData.footer.backgroundColor || '#0a2540').replace(/[^0-9a-f]/gi, '').substring(0,6) || '0a2540'}"></div>
+            <div id="footer-columnas-list">${footerColumnasHTML || '<p>No hay columnas</p>'}</div>
             <button class="btn-add" onclick="addFooterCol()">+ Agregar Columna</button>
             <button class="btn-save" style="margin-top:20px;" onclick="updateFooter()">Guardar cambios</button>
         `;
+        
+        // Inicializar preview de imágenes
+        document.querySelectorAll('.image-preview').forEach(preview => {
+            const input = preview.previousElementSibling;
+            if (input && input.type === 'text') {
+                input.addEventListener('input', () => {
+                    preview.style.backgroundImage = `url('${input.value}')`;
+                });
+            }
+        });
     }
     
-    // Funciones de actualización
+    // ========== FUNCIONES DE ACTUALIZACIÓN ==========
     function updateGeneral() {
         if (!currentData.config) currentData.config = {};
-        currentData.config.siteName = document.getElementById('site-name').value;
-        currentData.config.primaryColor = document.getElementById('primary-color').value;
-        currentData.config.secondaryColor = document.getElementById('secondary-color').value;
-        currentData.config.accentColor = document.getElementById('accent-color').value;
-        currentData.config.fontFamily = document.getElementById('font-family').value;
+        currentData.config.siteName = document.getElementById('site-name')?.value || '';
+        currentData.config.primaryColor = document.getElementById('primary-color')?.value || '#f15a24';
+        currentData.config.secondaryColor = document.getElementById('secondary-color')?.value || '#0a2540';
+        currentData.config.accentColor = document.getElementById('accent-color')?.value || '#00b48a';
+        currentData.config.fontFamily = document.getElementById('font-family')?.value || "'Inter', sans-serif";
         renderSite();
         updateStatus();
     }
     
     function updateHeader() {
-        currentData.header.logoText = document.getElementById('logo-text').value;
-        currentData.header.logoImage = document.getElementById('logo-image').value;
-        currentData.header.logoWidth = document.getElementById('logo-width').value;
-        currentData.header.logoHeight = document.getElementById('logo-height').value;
-        currentData.header.whatsappNumber = document.getElementById('whatsapp-number').value;
-        currentData.header.whatsappText = document.getElementById('whatsapp-text').value;
-        currentData.header.backgroundColor = document.getElementById('header-bg').value;
-        currentData.header.textColor = document.getElementById('header-color').value;
+        currentData.header.logoText = document.getElementById('logo-text')?.value || '';
+        currentData.header.logoImage = document.getElementById('logo-image')?.value || '';
+        currentData.header.logoWidth = document.getElementById('logo-width')?.value || '55px';
+        currentData.header.logoHeight = document.getElementById('logo-height')?.value || '55px';
+        currentData.header.whatsappNumber = document.getElementById('whatsapp-number')?.value || '';
+        currentData.header.whatsappText = document.getElementById('whatsapp-text')?.value || 'Reservar';
+        currentData.header.backgroundColor = document.getElementById('header-bg')?.value || '#ffffff';
+        currentData.header.textColor = document.getElementById('header-color')?.value || '#111111';
         renderSite();
         updateStatus();
     }
@@ -424,14 +535,16 @@
             });
         }
         currentData.hero.slides = slides;
-        currentData.hero.autoplaySpeed = parseInt(document.getElementById('autoplay-speed').value);
+        currentData.hero.autoplaySpeed = parseInt(document.getElementById('autoplay-speed')?.value || 5000);
         renderSite();
         updateStatus();
     }
     
     function updatePaquetes() {
-        currentData.seccionPaquetes.title = document.getElementById('paquetes-title').value;
-        currentData.seccionPaquetes.subtitle = document.getElementById('paquetes-subtitle').value;
+        if (document.getElementById('paquetes-title')) {
+            currentData.seccionPaquetes.title = document.getElementById('paquetes-title').value;
+            currentData.seccionPaquetes.subtitle = document.getElementById('paquetes-subtitle').value;
+        }
         
         for (let p of currentData.paquetes) {
             p.nombre = document.getElementById(`paq-nombre-${p.id}`)?.value || p.nombre;
@@ -444,8 +557,8 @@
             p.ciudad = document.getElementById(`paq-ciudad-${p.id}`)?.value || '';
             p.noches = document.getElementById(`paq-noches-${p.id}`)?.value || '';
             p.salida = document.getElementById(`paq-salida-${p.id}`)?.value || '';
-            p.incluye = document.getElementById(`paq-incluye-${p.id}`)?.value.split(',').map(s => s.trim()) || [];
             p.whatsapp = document.getElementById(`paq-whatsapp-${p.id}`)?.value || '';
+            p.incluye = document.getElementById(`paq-incluye-${p.id}`)?.value.split(',').map(s => s.trim()) || [];
             try {
                 p.itinerario = JSON.parse(document.getElementById(`paq-itinerario-${p.id}`)?.value || '[]');
             } catch(e) {}
@@ -458,7 +571,9 @@
     }
     
     function updateBeneficios() {
-        currentData.seccionBeneficios.title = document.getElementById('beneficios-title').value;
+        if (document.getElementById('beneficios-title')) {
+            currentData.seccionBeneficios.title = document.getElementById('beneficios-title').value;
+        }
         const nuevosBeneficios = [];
         const count = document.querySelectorAll('[id^="ben-titulo-"]').length;
         for (let i = 0; i < count; i++) {
@@ -474,8 +589,12 @@
     }
     
     function updateFooter() {
-        currentData.footer.copyright = document.getElementById('footer-copyright').value;
-        currentData.footer.backgroundColor = document.getElementById('footer-bg').value;
+        if (document.getElementById('footer-copyright')) {
+            currentData.footer.copyright = document.getElementById('footer-copyright').value;
+        }
+        if (document.getElementById('footer-bg')) {
+            currentData.footer.backgroundColor = document.getElementById('footer-bg').value;
+        }
         
         const nuevasColumnas = [];
         const count = document.querySelectorAll('[id^="footer-titulo-"]').length;
@@ -492,7 +611,7 @@
         updateStatus();
     }
     
-    // Funciones de agregar/eliminar
+    // ========== FUNCIONES DE AGREGAR/ELIMINAR ==========
     function addHeroSlide() {
         if (!currentData.hero.slides) currentData.hero.slides = [];
         currentData.hero.slides.push({
