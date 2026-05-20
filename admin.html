@@ -11,7 +11,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #0f172a; }
         
-        /* Admin Bar */
         .admin-bar { background: #1e293b; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; position: sticky; top: 0; z-index: 1000; }
         .admin-bar h2 { font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
         .admin-bar h2 i { color: #f15a24; }
@@ -23,12 +22,10 @@
         .btn-exit:hover { background: #334155; }
         .status { background: #334155; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; }
         
-        /* Editor Panel */
         .editor-container { display: flex; min-height: calc(100vh - 60px); }
         .site-preview { flex: 1; background: white; overflow-y: auto; position: relative; }
-        .editor-sidebar { width: 380px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; box-shadow: -5px 0 15px rgba(0,0,0,0.05); }
+        .editor-sidebar { width: 420px; background: white; border-left: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; max-height: calc(100vh - 60px); }
         
-        /* Bloques editables */
         .editable-block { position: relative; cursor: pointer; transition: all 0.2s; }
         .editable-block:hover { outline: 2px solid #f15a24; outline-offset: 2px; }
         .editable-block.active { outline: 3px solid #f15a24; outline-offset: 3px; background: rgba(241,90,36,0.05); }
@@ -36,7 +33,6 @@
         .edit-indicator { position: absolute; top: -10px; right: -10px; background: #f15a24; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 10; opacity: 0; transition: opacity 0.2s; }
         .editable-block:hover .edit-indicator { opacity: 1; }
         
-        /* Formularios del sidebar */
         .sidebar-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f15a24; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #1e293b; font-size: 0.85rem; }
@@ -45,15 +41,24 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .image-preview { width: 100%; height: 150px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
+        .btn-add { background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px; margin-top: 10px; }
+        .slide-item { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .slide-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
         @media (max-width: 768px) {
             .editor-container { flex-direction: column; }
-            .editor-sidebar { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; }
+            .editor-sidebar { width: 100%; max-height: 50vh; }
         }
         
         .loading-spinner { display: flex; justify-content: center; align-items: center; height: 400px; }
         .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top-color: #f15a24; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; padding: 8px 16px; cursor: pointer; border-radius: 8px; font-weight: 500; }
+        .tab-btn.active { background: #f15a24; color: white; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
     </style>
 </head>
 <body>
@@ -77,128 +82,86 @@
         <div class="sidebar-title">
             <i class="fas fa-mouse-pointer"></i> Editor de contenido
         </div>
-        <p style="color: #64748b; margin-bottom: 20px;">Haz clic en cualquier elemento del sitio para editarlo</p>
-        <div id="editor-form">
-            <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="general">General</button>
+            <button class="tab-btn" data-tab="header">Header</button>
+            <button class="tab-btn" data-tab="hero">Hero</button>
+            <button class="tab-btn" data-tab="paquetes">Paquetes</button>
+            <button class="tab-btn" data-tab="beneficios">Beneficios</button>
+            <button class="tab-btn" data-tab="footer">Footer</button>
+        </div>
+        
+        <div id="tab-general" class="tab-pane active">
+            <div id="editor-form-general">
+                <p style="color: #94a3b8; text-align: center;">Configuración general del sitio</p>
+            </div>
+        </div>
+        <div id="tab-header" class="tab-pane">
+            <div id="editor-form-header">
+                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+            </div>
+        </div>
+        <div id="tab-hero" class="tab-pane">
+            <div id="editor-form-hero">
+                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+            </div>
+        </div>
+        <div id="tab-paquetes" class="tab-pane">
+            <div id="editor-form-paquetes">
+                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+            </div>
+        </div>
+        <div id="tab-beneficios" class="tab-pane">
+            <div id="editor-form-beneficios">
+                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+            </div>
+        </div>
+        <div id="tab-footer" class="tab-pane">
+            <div id="editor-form-footer">
+                <p style="color: #94a3b8; text-align: center;">Cargando...</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Configuración - REEMPLAZA CON TUS DATOS
+    // Configuración
     const SUPABASE_URL = 'https://fwqojlaepsfbbbwwguwd.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
-    const VERCEL_WEBHOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_6FdpSljEMxSx1lGEEx2RyV0npaYg/HqroRrnwu2';
+    const VERCEL_WEBHOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_TU_PROYECTO/TU_TOKEN';
     
-    // Inicializar Supabase (solo una vez)
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
     let currentData = null;
-    let selectedBlock = null;
-    let selectedPath = null;
-    let isLoading = true;
     
-    // Cargar el sitio y los datos
-    async function loadSite() {
-        try {
-            document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
-            
-            // Cargar datos de Supabase
-            const { data, error } = await supabaseClient
-                .from('website_content')
-                .select('contenido')
-                .eq('id', 1)
-                .single();
-            
-            if (error) {
-                console.error('Error loading data:', error);
-                currentData = getDefaultData();
-            } else if (data && data.contenido) {
-                currentData = data.contenido;
-            } else {
-                currentData = getDefaultData();
-            }
-            
-            // Asegurar que existan arrays necesarios
-            if (!currentData.paquetes) currentData.paquetes = [];
-            if (!currentData.beneficios) currentData.beneficios = [];
-            if (!currentData.footer) currentData.footer = { copyright: "", columnas: [] };
-            if (!currentData.footer.columnas) currentData.footer.columnas = [];
-            
-            // Renderizar el sitio
-            renderSite();
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> Listo';
-            isLoading = false;
-            
-        } catch (err) {
-            console.error('Error:', err);
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #ef4444; font-size: 10px;"></i> Error al cargar';
+    async function loadData() {
+        const { data, error } = await supabaseClient
+            .from('website_content')
+            .select('contenido')
+            .eq('id', 1)
+            .single();
+        
+        if (data && data.contenido) {
+            currentData = data.contenido;
+        } else {
             currentData = getDefaultData();
-            renderSite();
         }
+        
+        renderSite();
+        loadForms();
     }
     
     function getDefaultData() {
         return {
-            header: { 
-                logoText: "marcela<br><span>correa</span> turismo", 
-                logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", 
-                whatsappNumber: "5493624331702" 
-            },
-            hero: { 
-                enabled: true, 
-                badge: "🌎 viajes de autor · cupos limitados", 
-                title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", 
-                subtitle: "Paquetes exclusivos con salidas garantizadas", 
-                backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", 
-                buttonPrimaryText: "Explorar paquetes", 
-                buttonSecondaryText: "Hablar por WhatsApp" 
-            },
-            paquetes: [
-                {
-                    id: 1,
-                    nombre: "Buenos Aires Vip",
-                    precio: 199000,
-                    imagen: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3",
-                    badge: "Próxima salida",
-                    badgeColor: "#f15a24",
-                    descripcionCorta: "Salida 12 de Junio. Incluye excursiones a River, Boca, San Telmo, Luján.",
-                    incluye: ["Hotel 5 estrellas", "Desayunos", "City tour"]
-                },
-                {
-                    id: 2,
-                    nombre: "Mendoza & Nieve",
-                    precio: 280000,
-                    imagen: "https://images.unsplash.com/photo-1533105079780-92b9be482077",
-                    badge: "Cupos reducidos",
-                    badgeColor: "#00b48a",
-                    descripcionCorta: "Salidas 30 de Abril / 22 Mayo. Desayunos, guía local, traslados.",
-                    incluye: ["Bodegas", "Excursión a la nieve", "Desayunos"]
-                },
-                {
-                    id: 3,
-                    nombre: "Tafí + Termas",
-                    precio: 280000,
-                    imagen: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9",
-                    badge: "Todo incluido",
-                    badgeColor: "#520968",
-                    descripcionCorta: "2 noches, Termas de Río Hondo, visitas guiadas.",
-                    incluye: ["Termas incluidas", "Pensión completa", "Visitas guiadas"]
-                }
-            ],
-            beneficios: [
-                { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles y buses de primera línea" },
-                { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente en destino" },
-                { icono: "fa-credit-card", titulo: "Pago flexible", descripcion: "Tarjetas, efectivo, transferencia" },
-                { icono: "fa-map-pin", titulo: "Salidas garantizadas", descripcion: "Desde Resistencia, Corrientes y Villa Angela" }
-            ],
-            footer: { 
-                copyright: "© 2026 Marcela Correa Turismo", 
-                columnas: [
-                    { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }] },
-                    { titulo: "Contacto", enlaces: [{ texto: "WhatsApp", url: "https://wa.me/5493624331702" }] }
-                ] 
-            }
+            config: { siteName: "Marcela Correa Turismo", primaryColor: "#f15a24", secondaryColor: "#0a2540", accentColor: "#00b48a", fontFamily: "'Inter', sans-serif" },
+            header: { logoText: "marcela<br><span>correa</span> turismo", logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", logoWidth: "55px", logoHeight: "55px", whatsappNumber: "5493624331702", whatsappText: "Reservar", backgroundColor: "rgba(255,255,255,0.96)", textColor: "#111111" },
+            hero: { enabled: true, autoplaySpeed: 5000, slides: [{ id: 1, badge: "🌎 viajes de autor", title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", subtitle: "Paquetes exclusivos", backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", buttonPrimaryText: "Explorar", buttonPrimaryLink: "#paquetes", buttonSecondaryText: "WhatsApp" }] },
+            seccionPaquetes: { title: "Próximas <span style=\"color: #f15a24;\">salidas</span>", subtitle: "Elegí tu experiencia, nosotros nos encargamos del resto", backgroundColor: "#ffffff" },
+            paquetes: [],
+            seccionBeneficios: { title: "¿Por qué viajar con nosotros?", backgroundColor: "#fafafc" },
+            beneficios: [],
+            footer: { copyright: "© 2026 Marcela Correa Turismo", backgroundColor: "#0a2540", textColor: "rgba(255,255,255,0.8)", columnas: [] }
         };
     }
     
@@ -206,397 +169,408 @@
         const preview = document.getElementById('site-preview');
         const whatsappUrl = `https://wa.me/${currentData.header.whatsappNumber}`;
         
+        const heroSlidesHTML = (currentData.hero.slides || []).map((slide, idx) => `
+            <div class="hero-slide ${idx === 0 ? 'active' : ''}">
+                <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${slide.backgroundImage}'); background-size: cover;">
+                    <div class="container">
+                        <div class="hero-badge">${slide.badge}</div>
+                        <h1>${slide.title}</h1>
+                        <p>${slide.subtitle}</p>
+                        <div class="hero-buttons">
+                            <a href="${slide.buttonPrimaryLink}" class="btn-primary">${slide.buttonPrimaryText}</a>
+                            <a href="${whatsappUrl}" class="btn-outline">${slide.buttonSecondaryText}</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        `).join('');
+        
         const paquetesHTML = (currentData.paquetes || []).map(p => `
-            <div class="card-paquete" data-editable="paquete" data-id="${p.id}">
+            <div class="card-paquete" data-id="${p.id}">
                 <div class="card-img" style="background-image: url('${p.imagen}?w=500&h=260&fit=crop');"></div>
                 <div class="card-content">
-                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge || 'Destino'}</div>
-                    <h3 class="card-title">${p.nombre || 'Sin nombre'}</h3>
+                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge}</div>
+                    <h3 class="card-title">${p.nombre}</h3>
                     <div class="price">$${(p.precio || 0).toLocaleString()} <small>pp</small></div>
-                    <div class="features">
-                        ${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}
-                    </div>
+                    <div class="features">${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}</div>
                     <p>${p.descripcionCorta || ''}</p>
                     <div class="btn-card">Consultar ahora →</div>
                 </div>
             </div>
         `).join('');
         
-        const beneficiosHTML = (currentData.beneficios || []).map((b, idx) => `
-            <div class="benefit" data-editable="beneficio" data-idx="${idx}">
-                <i class="fas ${b.icono || 'fa-star'}"></i>
-                <h4>${b.titulo || ''}</h4>
-                <p>${b.descripcion || ''}</p>
+        const beneficiosHTML = (currentData.beneficios || []).map(b => `
+            <div class="benefit">
+                <i class="fas ${b.icono}"></i>
+                <h4>${b.titulo}</h4>
+                <p>${b.descripcion}</p>
             </div>
         `).join('');
         
-        const footerColumnasHTML = (currentData.footer.columnas || []).map((col, idx) => `
-            <div class="footer-col" data-editable="footer-col" data-idx="${idx}">
-                <h4>${col.titulo || ''}</h4>
-                ${(col.enlaces || []).map(link => `<a href="${link.url || '#'}" target="_blank"><i class="${link.icono || ''}"></i> ${link.texto || ''}</a>`).join('')}
-            </div>
-        `).join('');
-        
-        const html = `
+        preview.innerHTML = `
             <style>
-                ${getSiteStyles()}
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { font-family: 'Inter', sans-serif; }
+                .container { max-width:1400px; margin:0 auto; padding:0 40px; }
+                .main-header { position:sticky; top:0; background:${currentData.header.backgroundColor}; backdrop-filter:blur(8px); border-bottom:1px solid #eef2f5; z-index:100; }
+                .header-top { display:flex; justify-content:space-between; align-items:center; padding:20px 0; flex-wrap:wrap; }
+                .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+                .logo-icon img { width:${currentData.header.logoWidth}; height:${currentData.header.logoHeight}; border-radius:12px; object-fit:cover; }
+                .logo-text { font-weight:800; font-size:1.2rem; color:${currentData.header.textColor}; }
+                .logo-text span { color:#f15a24; }
+                .btn-wa { background:#f15a24; padding:10px 24px; border-radius:40px; text-decoration:none; color:white; font-weight:600; display:inline-flex; align-items:center; gap:8px; }
+                .hero { padding:140px 0; color:white; text-align:center; background-size:cover !important; }
+                .hero h1 { font-size:4.2rem; font-weight:800; margin-bottom:20px; }
+                .hero h1 span { color:#f15a24; }
+                .hero p { font-size:1.2rem; max-width:600px; margin:0 auto 32px; }
+                .hero-buttons { display:flex; gap:20px; justify-content:center; }
+                .btn-primary { background:#f15a24; padding:14px 36px; border-radius:60px; text-decoration:none; color:white; font-weight:600; display:inline-flex; gap:8px; }
+                .btn-outline { background:transparent; border:1px solid white; padding:12px 32px; border-radius:60px; text-decoration:none; color:white; font-weight:500; }
+                .paquetes { padding:100px 0; background:${currentData.seccionPaquetes.backgroundColor}; }
+                .section-title { font-size:3rem; font-weight:800; text-align:center; margin-bottom:16px; }
+                .section-sub { text-align:center; color:#5b6e8c; margin-bottom:64px; }
+                .paquetes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:40px; }
+                .card-paquete { background:white; border-radius:24px; overflow:hidden; border:1px solid #eef2f5; cursor:pointer; transition:0.3s; }
+                .card-paquete:hover { transform:translateY(-8px); box-shadow:0 24px 36px -12px rgba(0,0,0,0.15); }
+                .card-img { height:240px; background-size:cover; background-position:center; }
+                .card-content { padding:28px 24px; }
+                .card-title { font-size:1.6rem; font-weight:700; margin-bottom:8px; }
+                .price { font-size:2rem; font-weight:800; color:#f15a24; margin:16px 0; }
+                .badge { display:inline-block; background:#f15a24; color:white; font-size:0.7rem; font-weight:700; padding:4px 12px; border-radius:50px; margin-bottom:12px; }
+                .features { display:flex; flex-wrap:wrap; gap:16px; margin:20px 0; font-size:0.85rem; color:#5b6e8c; border-top:1px solid #eef2f5; padding-top:20px; }
+                .features i { color:#00b48a; margin-right:6px; }
+                .btn-card { background:#eef2fa; border:none; padding:14px; border-radius:40px; font-weight:600; cursor:pointer; width:100%; text-align:center; }
+                .benefits { background:${currentData.seccionBeneficios.backgroundColor}; padding:80px 0; }
+                .benefits-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:40px; text-align:center; }
+                .benefit i { font-size:2rem; color:#f15a24; margin-bottom:20px; }
+                .footer { background:${currentData.footer.backgroundColor}; color:${currentData.footer.textColor}; padding:60px 0 30px; }
+                .footer-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:40px; }
+                .footer-col h4 { color:white; margin-bottom:20px; }
+                .footer-col a { display:block; color:rgba(255,255,255,0.7); text-decoration:none; margin-bottom:12px; }
+                .footer-bottom { text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); }
+                .hero-slide { display:none; }
+                .hero-slide.active { display:block; }
+                @media (max-width:768px) { .hero h1 { font-size:2.2rem; } .paquetes-grid { grid-template-columns:1fr; } .benefits-grid { grid-template-columns:1fr; } .container { padding:0 24px; } }
             </style>
-            <div style="max-width: 1400px; margin: 0 auto;">
-                <!-- HEADER -->
-                <header class="main-header">
-                    <div class="container header-top">
-                        <a href="#" class="logo">
-                            <div class="logo-icon"><img src="${currentData.header.logoImage || ''}"></div>
-                            <div class="logo-text">${currentData.header.logoText || 'Marcela Correa'}</div>
-                        </a>
-                        <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> Reservar</a>
-                    </div>
-                </header>
-                
-                <!-- HERO -->
-                <div data-editable="hero">
-                    <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${currentData.hero.backgroundImage || ''}'); background-size: cover;">
-                        <div class="container">
-                            <div class="hero-badge">${currentData.hero.badge || ''}</div>
-                            <h1>${currentData.hero.title || 'Viajá con <span>Marcela Correa</span>'}</h1>
-                            <p>${currentData.hero.subtitle || ''}</p>
-                            <div class="hero-buttons">
-                                <a href="#paquetes" class="btn-primary">${currentData.hero.buttonPrimaryText || 'Explorar'}</a>
-                                <a href="${whatsappUrl}" class="btn-outline">${currentData.hero.buttonSecondaryText || 'WhatsApp'}</a>
-                            </div>
-                        </div>
-                    </section>
+            <header class="main-header"><div class="container header-top"><a href="#" class="logo"><div class="logo-icon"><img src="${currentData.header.logoImage}"></div><div class="logo-text">${currentData.header.logoText}</div></a><a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> ${currentData.header.whatsappText}</a></div></header>
+            <div class="hero-slider">${heroSlidesHTML}</div>
+            <section class="paquetes"><div class="container"><h2 class="section-title">${currentData.seccionPaquetes.title}</h2><div class="section-sub">${currentData.seccionPaquetes.subtitle}</div><div class="paquetes-grid">${paquetesHTML}</div></div></section>
+            <section class="benefits"><div class="container"><h2 class="section-title">${currentData.seccionBeneficios.title}</h2><div class="benefits-grid">${beneficiosHTML}</div></div></section>
+            <footer class="footer"><div class="container"><div class="footer-grid">${(currentData.footer.columnas || []).map(col => `<div class="footer-col"><h4>${col.titulo}</h4>${(col.enlaces || []).map(link => `<a href="${link.url}">${link.texto}</a>`).join('')}</div>`).join('')}</div><div class="footer-bottom"><p>${currentData.footer.copyright}</p></div></div></footer>
+        `;
+    }
+    
+    function loadForms() {
+        // Formulario General
+        document.getElementById('editor-form-general').innerHTML = `
+            <h3><i class="fas fa-cog"></i> Configuración General</h3>
+            <div class="form-group"><label>Nombre del sitio</label><input type="text" id="site-name" value="${currentData.config?.siteName || ''}"></div>
+            <div class="form-group"><label>Color primario</label><input type="color" id="primary-color" value="${currentData.config?.primaryColor || '#f15a24'}"></div>
+            <div class="form-group"><label>Color secundario</label><input type="color" id="secondary-color" value="${currentData.config?.secondaryColor || '#0a2540'}"></div>
+            <div class="form-group"><label>Color acento</label><input type="color" id="accent-color" value="${currentData.config?.accentColor || '#00b48a'}"></div>
+            <div class="form-group"><label>Fuente</label><input type="text" id="font-family" value="${currentData.config?.fontFamily || "'Inter', sans-serif"}"></div>
+            <button class="btn-save" onclick="updateGeneral()">Guardar cambios</button>
+        `;
+        
+        // Formulario Header
+        document.getElementById('editor-form-header').innerHTML = `
+            <h3><i class="fas fa-heading"></i> Configuración del Header</h3>
+            <div class="form-group"><label>Texto del logo</label><input type="text" id="logo-text" value="${escapeHtml(currentData.header.logoText)}"></div>
+            <div class="form-group"><label>URL del logo</label><input type="text" id="logo-image" value="${currentData.header.logoImage}"><div class="image-preview" style="background-image: url('${currentData.header.logoImage}');"></div></div>
+            <div class="form-row"><div class="form-group"><label>Ancho logo</label><input type="text" id="logo-width" value="${currentData.header.logoWidth}"></div><div class="form-group"><label>Alto logo</label><input type="text" id="logo-height" value="${currentData.header.logoHeight}"></div></div>
+            <div class="form-group"><label>WhatsApp número</label><input type="text" id="whatsapp-number" value="${currentData.header.whatsappNumber}"></div>
+            <div class="form-group"><label>Texto botón WhatsApp</label><input type="text" id="whatsapp-text" value="${currentData.header.whatsappText}"></div>
+            <div class="form-group"><label>Color de fondo header</label><input type="color" id="header-bg" value="${currentData.header.backgroundColor.replace(/[^0-9a-f]/gi, '') || 'ffffff'}"></div>
+            <div class="form-group"><label>Color texto header</label><input type="color" id="header-color" value="${currentData.header.textColor.replace(/[^0-9a-f]/gi, '') || '111111'}"></div>
+            <button class="btn-save" onclick="updateHeader()">Guardar cambios</button>
+        `;
+        
+        // Formulario Hero (múltiples slides)
+        let slidesHTML = '';
+        (currentData.hero.slides || []).forEach((slide, idx) => {
+            slidesHTML += `
+                <div class="slide-item">
+                    <div class="slide-header"><strong>Slide ${idx + 1}</strong><button class="btn-remove" onclick="removeHeroSlide(${idx})">Eliminar</button></div>
+                    <div class="form-group"><label>Badge</label><input type="text" id="hero-badge-${idx}" value="${escapeHtml(slide.badge)}"></div>
+                    <div class="form-group"><label>Título</label><textarea id="hero-title-${idx}" rows="2">${escapeHtml(slide.title)}</textarea></div>
+                    <div class="form-group"><label>Subtítulo</label><textarea id="hero-subtitle-${idx}" rows="2">${escapeHtml(slide.subtitle)}</textarea></div>
+                    <div class="form-group"><label>Imagen URL</label><input type="text" id="hero-image-${idx}" value="${slide.backgroundImage}"><div class="image-preview" style="background-image: url('${slide.backgroundImage}');"></div></div>
+                    <div class="form-row"><div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary-${idx}" value="${slide.buttonPrimaryText}"></div><div class="form-group"><label>Link</label><input type="text" id="hero-btn-link-${idx}" value="${slide.buttonPrimaryLink}"></div></div>
+                    <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary-${idx}" value="${slide.buttonSecondaryText}"></div>
                 </div>
-                
-                <!-- PAQUETES -->
-                <section class="paquetes">
-                    <div class="container">
-                        <h2 class="section-title">Próximas <span style="color: #f15a24;">salidas</span></h2>
-                        <div class="section-sub">Elegí tu experiencia, nosotros nos encargamos del resto</div>
-                        <div class="paquetes-grid">${paquetesHTML || '<p style="text-align:center">No hay paquetes. Agrega uno desde el editor.</p>'}</div>
-                        <button class="add-paquete-btn" onclick="window.addPaquete && window.addPaquete()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Paquete</button>
-                    </div>
-                </section>
-                
-                <!-- BENEFICIOS -->
-                <section class="benefits">
-                    <div class="container">
-                        <div class="benefits-grid">${beneficiosHTML}</div>
-                        <button class="add-beneficio-btn" onclick="window.addBeneficio && window.addBeneficio()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Beneficio</button>
-                    </div>
-                </section>
-                
-                <!-- FOOTER -->
-                <footer class="footer">
-                    <div class="container">
-                        <div class="footer-grid">${footerColumnasHTML}</div>
-                        <div class="footer-bottom"><p>${currentData.footer.copyright || ''}</p></div>
-                    </div>
-                </footer>
-            </div>
-        `;
-        
-        preview.innerHTML = html;
-        
-        // Agregar event listeners a bloques editables
-        document.querySelectorAll('[data-editable]').forEach(el => {
-            el.classList.add('editable-block');
-            const indicator = document.createElement('div');
-            indicator.className = 'edit-indicator';
-            indicator.innerHTML = '<i class="fas fa-pencil-alt"></i>';
-            el.style.position = 'relative';
-            el.appendChild(indicator);
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectBlock(el);
-            });
+            `;
         });
-    }
-    
-    function getSiteStyles() {
-        return `
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Inter', sans-serif; background: #ffffff; color: #111111; }
-            .container { max-width: 1400px; margin: 0 auto; padding: 0 40px; }
-            .main-header { position: sticky; top: 0; background: rgba(255,255,255,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid #eef2f5; z-index: 100; }
-            .header-top { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; flex-wrap: wrap; }
-            .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-            .logo-icon img { width: 55px; height: 55px; border-radius: 12px; object-fit: cover; }
-            .logo-text { font-weight: 800; font-size: 1.2rem; color: #111; }
-            .logo-text span { color: #f15a24; }
-            .btn-wa { background: #f15a24; padding: 10px 24px; border-radius: 40px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-            .hero { padding: 140px 0; color: white; text-align: center; }
-            .hero h1 { font-size: 4.2rem; font-weight: 800; margin-bottom: 20px; }
-            .hero h1 span { color: #f15a24; }
-            .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 32px; }
-            .hero-buttons { display: flex; gap: 20px; justify-content: center; }
-            .btn-primary { background: #f15a24; padding: 14px 36px; border-radius: 60px; text-decoration: none; color: white; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-            .btn-outline { background: transparent; border: 1px solid white; padding: 12px 32px; border-radius: 60px; text-decoration: none; color: white; font-weight: 500; }
-            .paquetes { padding: 100px 0; }
-            .section-title { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 16px; }
-            .section-sub { text-align: center; color: #5b6e8c; margin-bottom: 64px; }
-            .paquetes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
-            .card-paquete { background: white; border-radius: 24px; overflow: hidden; border: 1px solid #eef2f5; cursor: pointer; transition: 0.3s; }
-            .card-paquete:hover { transform: translateY(-8px); box-shadow: 0 24px 36px -12px rgba(0,0,0,0.15); }
-            .card-img { height: 240px; background-size: cover; background-position: center; }
-            .card-content { padding: 28px 24px; }
-            .card-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
-            .price { font-size: 2rem; font-weight: 800; color: #f15a24; margin: 16px 0; }
-            .badge { display: inline-block; background: #f15a24; color: white; font-size: 0.7rem; font-weight: 700; padding: 4px 12px; border-radius: 50px; margin-bottom: 12px; }
-            .features { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; font-size: 0.85rem; color: #5b6e8c; border-top: 1px solid #eef2f5; padding-top: 20px; }
-            .features i { color: #00b48a; margin-right: 6px; }
-            .btn-card { background: #eef2fa; border: none; padding: 14px; border-radius: 40px; font-weight: 600; cursor: pointer; width: 100%; text-align: center; }
-            .btn-card:hover { background: #f15a24; color: white; }
-            .benefits { background: #fafafc; padding: 80px 0; }
-            .benefits-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
-            .benefit i { font-size: 2rem; color: #f15a24; margin-bottom: 20px; }
-            .footer { background: #0a2540; color: rgba(255,255,255,0.8); padding: 60px 0 30px; }
-            .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
-            .footer-col h4 { color: white; margin-bottom: 20px; }
-            .footer-col a { display: block; color: rgba(255,255,255,0.7); text-decoration: none; margin-bottom: 12px; }
-            .footer-bottom { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
-            @media (max-width: 768px) {
-                .hero h1 { font-size: 2.2rem; }
-                .paquetes-grid { grid-template-columns: 1fr; }
-                .benefits-grid { grid-template-columns: 1fr; }
-                .container { padding: 0 24px; }
-            }
+        
+        document.getElementById('editor-form-hero').innerHTML = `
+            <h3><i class="fas fa-images"></i> Slider del Hero</h3>
+            <div class="form-group"><label>Autoplay speed (ms)</label><input type="number" id="autoplay-speed" value="${currentData.hero.autoplaySpeed || 5000}"></div>
+            <div id="hero-slides-container">${slidesHTML}</div>
+            <button class="btn-add" onclick="addHeroSlide()">+ Agregar Slide</button>
+            <button class="btn-save" style="margin-top:20px;" onclick="updateHero()">Guardar cambios</button>
+        `;
+        
+        // Formulario Paquetes
+        let paquetesHTML = '';
+        (currentData.paquetes || []).forEach((p, idx) => {
+            paquetesHTML += `
+                <div class="slide-item">
+                    <div class="slide-header"><strong>${p.nombre}</strong><button class="btn-remove" onclick="removePaquete(${p.id})">Eliminar</button></div>
+                    <div class="form-group"><label>Nombre</label><input type="text" id="paq-nombre-${p.id}" value="${escapeHtml(p.nombre)}"></div>
+                    <div class="form-row"><div class="form-group"><label>Precio</label><input type="number" id="paq-precio-${p.id}" value="${p.precio}"></div><div class="form-group"><label>Badge</label><input type="text" id="paq-badge-${p.id}" value="${p.badge}"></div></div>
+                    <div class="form-group"><label>Color badge</label><input type="color" id="paq-badge-color-${p.id}" value="${p.badgeColor || '#f15a24'}"></div>
+                    <div class="form-group"><label>Imagen URL</label><input type="text" id="paq-imagen-${p.id}" value="${p.imagen}"><div class="image-preview" style="background-image: url('${p.imagen}');"></div></div>
+                    <div class="form-group"><label>Descripción corta</label><textarea id="paq-descripcion-${p.id}" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea></div>
+                    <div class="form-group"><label>Descripción completa (modal)</label><textarea id="paq-descripcion-completa-${p.id}" rows="3">${escapeHtml(p.descripcionCompleta || '')}</textarea></div>
+                    <div class="form-group"><label>Ciudad</label><input type="text" id="paq-ciudad-${p.id}" value="${p.ciudad || ''}"></div>
+                    <div class="form-row"><div class="form-group"><label>Noches</label><input type="text" id="paq-noches-${p.id}" value="${p.noches || ''}"></div><div class="form-group"><label>Salida</label><input type="text" id="paq-salida-${p.id}" value="${p.salida || ''}"></div></div>
+                    <div class="form-group"><label>Incluye (separado por comas)</label><input type="text" id="paq-incluye-${p.id}" value="${(p.incluye || []).join(', ')}"></div>
+                    <div class="form-group"><label>WhatsApp texto</label><input type="text" id="paq-whatsapp-${p.id}" value="${p.whatsapp || ''}"></div>
+                    <details><summary>Itinerario (editar JSON)</summary><textarea id="paq-itinerario-${p.id}" rows="6">${JSON.stringify(p.itinerario || [], null, 2)}</textarea></details>
+                    <details><summary>Hoteles (editar JSON)</summary><textarea id="paq-hoteles-${p.id}" rows="6">${JSON.stringify(p.hoteles || [], null, 2)}</textarea></details>
+                </div>
+            `;
+        });
+        
+        document.getElementById('editor-form-paquetes').innerHTML = `
+            <h3><i class="fas fa-box"></i> Paquetes Turísticos</h3>
+            <div class="form-group"><label>Título sección</label><input type="text" id="paquetes-title" value="${escapeHtml(currentData.seccionPaquetes.title)}"></div>
+            <div class="form-group"><label>Subtítulo sección</label><input type="text" id="paquetes-subtitle" value="${escapeHtml(currentData.seccionPaquetes.subtitle)}"></div>
+            <div id="paquetes-list">${paquetesHTML}</div>
+            <button class="btn-add" onclick="addPaquete()">+ Agregar Paquete</button>
+            <button class="btn-save" style="margin-top:20px;" onclick="updatePaquetes()">Guardar cambios</button>
+        `;
+        
+        // Formulario Beneficios
+        let beneficiosHTML = '';
+        (currentData.beneficios || []).forEach((b, idx) => {
+            beneficiosHTML += `
+                <div class="slide-item">
+                    <div class="slide-header"><strong>${b.titulo}</strong><button class="btn-remove" onclick="removeBeneficio(${idx})">Eliminar</button></div>
+                    <div class="form-group"><label>Icono</label><input type="text" id="ben-icono-${idx}" value="${b.icono}"></div>
+                    <div class="form-group"><label>Título</label><input type="text" id="ben-titulo-${idx}" value="${escapeHtml(b.titulo)}"></div>
+                    <div class="form-group"><label>Descripción</label><input type="text" id="ben-descripcion-${idx}" value="${escapeHtml(b.descripcion)}"></div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('editor-form-beneficios').innerHTML = `
+            <h3><i class="fas fa-gem"></i> Beneficios</h3>
+            <div class="form-group"><label>Título sección</label><input type="text" id="beneficios-title" value="${escapeHtml(currentData.seccionBeneficios.title)}"></div>
+            <div id="beneficios-list">${beneficiosHTML}</div>
+            <button class="btn-add" onclick="addBeneficio()">+ Agregar Beneficio</button>
+            <button class="btn-save" style="margin-top:20px;" onclick="updateBeneficios()">Guardar cambios</button>
+        `;
+        
+        // Formulario Footer
+        let footerColumnasHTML = '';
+        (currentData.footer.columnas || []).forEach((col, idx) => {
+            footerColumnasHTML += `
+                <div class="slide-item">
+                    <div class="slide-header"><strong>${col.titulo}</strong><button class="btn-remove" onclick="removeFooterCol(${idx})">Eliminar</button></div>
+                    <div class="form-group"><label>Título columna</label><input type="text" id="footer-titulo-${idx}" value="${escapeHtml(col.titulo)}"></div>
+                    <div class="form-group"><label>Enlaces (JSON)</label><textarea id="footer-enlaces-${idx}" rows="6">${JSON.stringify(col.enlaces || [], null, 2)}</textarea></div>
+                </div>
+            `;
+        });
+        
+        document.getElementById('editor-form-footer').innerHTML = `
+            <h3><i class="fas fa-globe"></i> Footer</h3>
+            <div class="form-group"><label>Copyright</label><input type="text" id="footer-copyright" value="${escapeHtml(currentData.footer.copyright)}"></div>
+            <div class="form-group"><label>Color de fondo</label><input type="color" id="footer-bg" value="${currentData.footer.backgroundColor?.replace(/[^0-9a-f]/gi, '') || '0a2540'}"></div>
+            <div id="footer-columnas-list">${footerColumnasHTML}</div>
+            <button class="btn-add" onclick="addFooterCol()">+ Agregar Columna</button>
+            <button class="btn-save" style="margin-top:20px;" onclick="updateFooter()">Guardar cambios</button>
         `;
     }
     
-    function selectBlock(el) {
-        // Remover clase active de todos
-        document.querySelectorAll('.editable-block').forEach(b => b.classList.remove('active'));
-        el.classList.add('active');
-        
-        const type = el.getAttribute('data-editable');
-        const id = el.getAttribute('data-id');
-        const idx = el.getAttribute('data-idx');
-        
-        selectedBlock = el;
-        
-        // Mostrar formulario según tipo
-        if (type === 'hero') {
-            showHeroForm();
-        } else if (type === 'beneficio') {
-            showBeneficioForm(parseInt(idx));
-        } else if (type === 'footer-col') {
-            showFooterColForm(parseInt(idx));
-        } else if (type === 'paquete') {
-            showPaqueteForm(parseInt(id));
-        }
+    // Funciones de actualización
+    function updateGeneral() {
+        if (!currentData.config) currentData.config = {};
+        currentData.config.siteName = document.getElementById('site-name').value;
+        currentData.config.primaryColor = document.getElementById('primary-color').value;
+        currentData.config.secondaryColor = document.getElementById('secondary-color').value;
+        currentData.config.accentColor = document.getElementById('accent-color').value;
+        currentData.config.fontFamily = document.getElementById('font-family').value;
+        renderSite();
+        updateStatus();
     }
     
-    function showHeroForm() {
-        const form = document.getElementById('editor-form');
-        form.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-film"></i> Editar Hero</h3>
-            <div class="form-group">
-                <label>Badge</label>
-                <input type="text" id="hero-badge" value="${escapeHtml(currentData.hero.badge || '')}">
-            </div>
-            <div class="form-group">
-                <label>Título (puede usar HTML)</label>
-                <textarea id="hero-title" rows="3">${escapeHtml(currentData.hero.title || '')}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Subtítulo</label>
-                <textarea id="hero-subtitle" rows="2">${escapeHtml(currentData.hero.subtitle || '')}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Imagen de fondo (URL)</label>
-                <input type="text" id="hero-image" value="${currentData.hero.backgroundImage || ''}">
-                <div class="image-preview" style="background-image: url('${currentData.hero.backgroundImage || ''}'); margin-top: 10px;"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary" value="${escapeHtml(currentData.hero.buttonPrimaryText || '')}"></div>
-                <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary" value="${escapeHtml(currentData.hero.buttonSecondaryText || '')}"></div>
-            </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateHero()">Actualizar Hero</button>
-        `;
-        
-        const imgInput = document.getElementById('hero-image');
-        if (imgInput) {
-            imgInput.addEventListener('input', (e) => {
-                const preview = document.querySelector('.image-preview');
-                if (preview) preview.style.backgroundImage = `url('${e.target.value}')`;
-            });
-        }
-    }
-    
-    function showBeneficioForm(idx) {
-        const b = currentData.beneficios[idx];
-        const form = document.getElementById('editor-form');
-        form.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-gem"></i> Editar Beneficio</h3>
-            <div class="form-group">
-                <label>Icono (clase FontAwesome, ej: fa-crown)</label>
-                <input type="text" id="beneficio-icono" value="${b.icono || ''}">
-            </div>
-            <div class="form-group">
-                <label>Título</label>
-                <input type="text" id="beneficio-titulo" value="${escapeHtml(b.titulo || '')}">
-            </div>
-            <div class="form-group">
-                <label>Descripción</label>
-                <textarea id="beneficio-descripcion" rows="2">${escapeHtml(b.descripcion || '')}</textarea>
-            </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateBeneficio(${idx})">Actualizar Beneficio</button>
-            <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removeBeneficio(${idx})">Eliminar Beneficio</button>
-        `;
-    }
-    
-    function showFooterColForm(idx) {
-        const col = currentData.footer.columnas[idx];
-        const form = document.getElementById('editor-form');
-        form.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-globe"></i> Editar Columna de Footer</h3>
-            <div class="form-group">
-                <label>Título de la columna</label>
-                <input type="text" id="footer-titulo" value="${escapeHtml(col.titulo || '')}">
-            </div>
-            <div class="form-group">
-                <label>Enlaces (edita el JSON)</label>
-                <textarea id="footer-enlaces" rows="6">${JSON.stringify(col.enlaces || [], null, 2)}</textarea>
-            </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateFooterCol(${idx})">Actualizar Columna</button>
-        `;
-    }
-    
-    function showPaqueteForm(id) {
-        const p = currentData.paquetes.find(p => p.id === id);
-        if (!p) return;
-        
-        const form = document.getElementById('editor-form');
-        form.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-box"></i> Editar Paquete: ${escapeHtml(p.nombre)}</h3>
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="paquete-nombre" value="${escapeHtml(p.nombre || '')}">
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Precio</label><input type="number" id="paquete-precio" value="${p.precio || 0}"></div>
-                <div class="form-group"><label>Badge</label><input type="text" id="paquete-badge" value="${escapeHtml(p.badge || '')}"></div>
-            </div>
-            <div class="form-group">
-                <label>Imagen (URL)</label>
-                <input type="text" id="paquete-imagen" value="${p.imagen || ''}">
-                <div class="image-preview" style="background-image: url('${p.imagen || ''}?w=300&h=180&fit=crop'); margin-top: 10px;"></div>
-            </div>
-            <div class="form-group">
-                <label>Descripción corta</label>
-                <textarea id="paquete-descripcion" rows="2">${escapeHtml(p.descripcionCorta || '')}</textarea>
-            </div>
-            <div class="form-group">
-                <label>Incluye (separado por comas)</label>
-                <input type="text" id="paquete-incluye" value="${(p.incluye || []).join(', ')}">
-            </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updatePaquete(${id})">Actualizar Paquete</button>
-            <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removePaquete(${id})">Eliminar Paquete</button>
-        `;
-        
-        const imgInput = document.getElementById('paquete-imagen');
-        if (imgInput) {
-            imgInput.addEventListener('input', (e) => {
-                const preview = document.querySelector('.image-preview');
-                if (preview) preview.style.backgroundImage = `url('${e.target.value}?w=300&h=180&fit=crop')`;
-            });
-        }
+    function updateHeader() {
+        currentData.header.logoText = document.getElementById('logo-text').value;
+        currentData.header.logoImage = document.getElementById('logo-image').value;
+        currentData.header.logoWidth = document.getElementById('logo-width').value;
+        currentData.header.logoHeight = document.getElementById('logo-height').value;
+        currentData.header.whatsappNumber = document.getElementById('whatsapp-number').value;
+        currentData.header.whatsappText = document.getElementById('whatsapp-text').value;
+        currentData.header.backgroundColor = document.getElementById('header-bg').value;
+        currentData.header.textColor = document.getElementById('header-color').value;
+        renderSite();
+        updateStatus();
     }
     
     function updateHero() {
-        currentData.hero.badge = document.getElementById('hero-badge').value;
-        currentData.hero.title = document.getElementById('hero-title').value;
-        currentData.hero.subtitle = document.getElementById('hero-subtitle').value;
-        currentData.hero.backgroundImage = document.getElementById('hero-image').value;
-        currentData.hero.buttonPrimaryText = document.getElementById('hero-btn-primary').value;
-        currentData.hero.buttonSecondaryText = document.getElementById('hero-btn-secondary').value;
-        renderSite();
-        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-    }
-    
-    function updateBeneficio(idx) {
-        currentData.beneficios[idx] = {
-            icono: document.getElementById('beneficio-icono').value,
-            titulo: document.getElementById('beneficio-titulo').value,
-            descripcion: document.getElementById('beneficio-descripcion').value
-        };
-        renderSite();
-        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-    }
-    
-    function removeBeneficio(idx) {
-        if (confirm('¿Eliminar este beneficio?')) {
-            currentData.beneficios.splice(idx, 1);
-            renderSite();
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-            document.getElementById('editor-form').innerHTML = '<p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>';
+        const slides = [];
+        const slideCount = document.querySelectorAll('[id^="hero-badge-"]').length;
+        for (let i = 0; i < slideCount; i++) {
+            slides.push({
+                id: i + 1,
+                badge: document.getElementById(`hero-badge-${i}`)?.value || '',
+                title: document.getElementById(`hero-title-${i}`)?.value || '',
+                subtitle: document.getElementById(`hero-subtitle-${i}`)?.value || '',
+                backgroundImage: document.getElementById(`hero-image-${i}`)?.value || '',
+                buttonPrimaryText: document.getElementById(`hero-btn-primary-${i}`)?.value || '',
+                buttonPrimaryLink: document.getElementById(`hero-btn-link-${i}`)?.value || '#',
+                buttonSecondaryText: document.getElementById(`hero-btn-secondary-${i}`)?.value || ''
+            });
         }
+        currentData.hero.slides = slides;
+        currentData.hero.autoplaySpeed = parseInt(document.getElementById('autoplay-speed').value);
+        renderSite();
+        updateStatus();
     }
     
-    function updateFooterCol(idx) {
-        try {
-            currentData.footer.columnas[idx] = {
-                titulo: document.getElementById('footer-titulo').value,
-                enlaces: JSON.parse(document.getElementById('footer-enlaces').value)
-            };
-            renderSite();
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-        } catch(e) {
-            alert('Error al parsear JSON de enlaces');
-        }
-    }
-    
-    function updatePaquete(id) {
-        const paquete = currentData.paquetes.find(p => p.id === id);
-        if (paquete) {
-            paquete.nombre = document.getElementById('paquete-nombre').value;
-            paquete.precio = parseInt(document.getElementById('paquete-precio').value);
-            paquete.badge = document.getElementById('paquete-badge').value;
-            paquete.imagen = document.getElementById('paquete-imagen').value;
-            paquete.descripcionCorta = document.getElementById('paquete-descripcion').value;
-            paquete.incluye = document.getElementById('paquete-incluye').value.split(',').map(s => s.trim());
+    function updatePaquetes() {
+        currentData.seccionPaquetes.title = document.getElementById('paquetes-title').value;
+        currentData.seccionPaquetes.subtitle = document.getElementById('paquetes-subtitle').value;
+        
+        for (let p of currentData.paquetes) {
+            p.nombre = document.getElementById(`paq-nombre-${p.id}`)?.value || p.nombre;
+            p.precio = parseInt(document.getElementById(`paq-precio-${p.id}`)?.value) || p.precio;
+            p.badge = document.getElementById(`paq-badge-${p.id}`)?.value || p.badge;
+            p.badgeColor = document.getElementById(`paq-badge-color-${p.id}`)?.value || p.badgeColor;
+            p.imagen = document.getElementById(`paq-imagen-${p.id}`)?.value || p.imagen;
+            p.descripcionCorta = document.getElementById(`paq-descripcion-${p.id}`)?.value || '';
+            p.descripcionCompleta = document.getElementById(`paq-descripcion-completa-${p.id}`)?.value || '';
+            p.ciudad = document.getElementById(`paq-ciudad-${p.id}`)?.value || '';
+            p.noches = document.getElementById(`paq-noches-${p.id}`)?.value || '';
+            p.salida = document.getElementById(`paq-salida-${p.id}`)?.value || '';
+            p.incluye = document.getElementById(`paq-incluye-${p.id}`)?.value.split(',').map(s => s.trim()) || [];
+            p.whatsapp = document.getElementById(`paq-whatsapp-${p.id}`)?.value || '';
+            try {
+                p.itinerario = JSON.parse(document.getElementById(`paq-itinerario-${p.id}`)?.value || '[]');
+            } catch(e) {}
+            try {
+                p.hoteles = JSON.parse(document.getElementById(`paq-hoteles-${p.id}`)?.value || '[]');
+            } catch(e) {}
         }
         renderSite();
-        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+        updateStatus();
     }
     
-    function removePaquete(id) {
-        if (confirm('¿Eliminar este paquete?')) {
-            currentData.paquetes = currentData.paquetes.filter(p => p.id !== id);
-            renderSite();
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-            document.getElementById('editor-form').innerHTML = '<p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>';
+    function updateBeneficios() {
+        currentData.seccionBeneficios.title = document.getElementById('beneficios-title').value;
+        const nuevosBeneficios = [];
+        const count = document.querySelectorAll('[id^="ben-titulo-"]').length;
+        for (let i = 0; i < count; i++) {
+            nuevosBeneficios.push({
+                icono: document.getElementById(`ben-icono-${i}`)?.value || 'fa-star',
+                titulo: document.getElementById(`ben-titulo-${i}`)?.value || '',
+                descripcion: document.getElementById(`ben-descripcion-${i}`)?.value || ''
+            });
         }
+        currentData.beneficios = nuevosBeneficios;
+        renderSite();
+        updateStatus();
     }
     
-    window.addPaquete = function() {
+    function updateFooter() {
+        currentData.footer.copyright = document.getElementById('footer-copyright').value;
+        currentData.footer.backgroundColor = document.getElementById('footer-bg').value;
+        
+        const nuevasColumnas = [];
+        const count = document.querySelectorAll('[id^="footer-titulo-"]').length;
+        for (let i = 0; i < count; i++) {
+            try {
+                nuevasColumnas.push({
+                    titulo: document.getElementById(`footer-titulo-${i}`)?.value || '',
+                    enlaces: JSON.parse(document.getElementById(`footer-enlaces-${i}`)?.value || '[]')
+                });
+            } catch(e) {}
+        }
+        currentData.footer.columnas = nuevasColumnas;
+        renderSite();
+        updateStatus();
+    }
+    
+    // Funciones de agregar/eliminar
+    function addHeroSlide() {
+        if (!currentData.hero.slides) currentData.hero.slides = [];
+        currentData.hero.slides.push({
+            id: Date.now(),
+            badge: "Nuevo destino",
+            title: "Nuevo título",
+            subtitle: "Descripción del nuevo slide",
+            backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
+            buttonPrimaryText: "Explorar",
+            buttonPrimaryLink: "#paquetes",
+            buttonSecondaryText: "WhatsApp"
+        });
+        loadForms();
+        updateStatus();
+    }
+    
+    function removeHeroSlide(idx) {
+        currentData.hero.slides.splice(idx, 1);
+        loadForms();
+        updateStatus();
+    }
+    
+    function addPaquete() {
         const newId = Date.now();
-        if (!currentData.paquetes) currentData.paquetes = [];
         currentData.paquetes.push({
             id: newId,
-            nombre: "Nuevo Destino",
+            nombre: "Nuevo destino",
             precio: 199000,
             imagen: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
             badge: "Nuevo",
             badgeColor: "#f15a24",
             descripcionCorta: "Descripción del nuevo paquete",
-            incluye: ["Incluye 1", "Incluye 2"]
+            descripcionCompleta: "Descripción completa del nuevo paquete",
+            ciudad: "Destino",
+            noches: "2 noches",
+            salida: "Próximamente",
+            incluye: ["Incluye 1", "Incluye 2"],
+            itinerario: [{ dia: "Día 1", titulo: "Llegada", texto: "Descripción" }],
+            hoteles: [{ nombre: "Hotel Ejemplo", imagen: "https://images.unsplash.com/photo-1566073771259-6a8506099945", rating: 4, descripcion: "Descripción del hotel" }],
+            whatsapp: "Hola! Quiero reservar este paquete"
         });
-        renderSite();
-        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-    };
+        loadForms();
+        updateStatus();
+    }
     
-    window.addBeneficio = function() {
-        if (!currentData.beneficios) currentData.beneficios = [];
-        currentData.beneficios.push({
-            icono: "fa-star",
-            titulo: "Nuevo beneficio",
-            descripcion: "Descripción del beneficio"
-        });
-        renderSite();
+    function removePaquete(id) {
+        currentData.paquetes = currentData.paquetes.filter(p => p.id !== id);
+        loadForms();
+        updateStatus();
+    }
+    
+    function addBeneficio() {
+        currentData.beneficios.push({ icono: "fa-star", titulo: "Nuevo beneficio", descripcion: "Descripción" });
+        loadForms();
+        updateStatus();
+    }
+    
+    function removeBeneficio(idx) {
+        currentData.beneficios.splice(idx, 1);
+        loadForms();
+        updateStatus();
+    }
+    
+    function addFooterCol() {
+        currentData.footer.columnas.push({ titulo: "Nueva columna", enlaces: [] });
+        loadForms();
+        updateStatus();
+    }
+    
+    function removeFooterCol(idx) {
+        currentData.footer.columnas.splice(idx, 1);
+        loadForms();
+        updateStatus();
+    }
+    
+    function updateStatus() {
         document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
-    };
+    }
     
     async function saveChanges() {
         document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
@@ -606,54 +580,58 @@
             .upsert({ id: 1, contenido: currentData, updated_at: new Date() });
         
         if (error) {
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #ef4444; font-size: 10px;"></i> Error: ' + error.message;
-            alert('Error al guardar: ' + error.message);
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #ef4444; font-size: 10px;"></i> Error';
+            alert('Error: ' + error.message);
             return;
         }
         
-        // Disparar webhook de Vercel
         try {
             await fetch(VERCEL_WEBHOOK, { method: 'POST' });
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> ¡Publicado! El sitio se actualizará en 1-2 minutos.';
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> ¡Publicado!';
         } catch(e) {
-            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Guardado, pero webhook falló.';
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Guardado (webhook falló)';
         }
         
-        // Mostrar mensaje de éxito
         const toast = document.createElement('div');
         toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 24px; border-radius: 12px; z-index: 2000;';
-        toast.innerHTML = '<i class="fas fa-check-circle"></i> Cambios publicados exitosamente!';
+        toast.innerHTML = '<i class="fas fa-check-circle"></i> Cambios publicados!';
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
     
-    function exitEditor() {
-        window.location.href = '/';
-    }
+    function exitEditor() { window.location.href = '/'; }
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
         });
-    }
+    });
     
-    // Exponer funciones globalmente
+    // Exponer funciones globales
+    window.updateGeneral = updateGeneral;
+    window.updateHeader = updateHeader;
     window.updateHero = updateHero;
-    window.updateBeneficio = updateBeneficio;
-    window.updateFooterCol = updateFooterCol;
-    window.updatePaquete = updatePaquete;
-    window.removeBeneficio = removeBeneficio;
+    window.updatePaquetes = updatePaquetes;
+    window.updateBeneficios = updateBeneficios;
+    window.updateFooter = updateFooter;
+    window.addHeroSlide = addHeroSlide;
+    window.removeHeroSlide = removeHeroSlide;
+    window.addPaquete = addPaquete;
     window.removePaquete = removePaquete;
+    window.addBeneficio = addBeneficio;
+    window.removeBeneficio = removeBeneficio;
+    window.addFooterCol = addFooterCol;
+    window.removeFooterCol = removeFooterCol;
     
     document.getElementById('btn-save').addEventListener('click', saveChanges);
     document.getElementById('btn-exit').addEventListener('click', exitEditor);
     
-    // Iniciar
-    loadSite();
+    loadData();
 </script>
 </body>
 </html>
