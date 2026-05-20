@@ -45,13 +45,15 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .image-preview { width: 100%; height: 150px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
         .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; }
-        .array-item { background: #f8fafc; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
-        .inline-icon { width: 30px; text-align: center; }
         
         @media (max-width: 768px) {
             .editor-container { flex-direction: column; }
             .editor-sidebar { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; }
         }
+        
+        .loading-spinner { display: flex; justify-content: center; align-items: center; height: 400px; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #e2e8f0; border-top-color: #f15a24; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -67,9 +69,8 @@
 
 <div class="editor-container">
     <div class="site-preview" id="site-preview">
-        <!-- Aquí se cargará el sitio público -->
-        <div style="display: flex; justify-content: center; align-items: center; height: 400px;">
-            <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #f15a24;"></i>
+        <div class="loading-spinner">
+            <div class="spinner"></div>
         </div>
     </div>
     <div class="editor-sidebar" id="editor-sidebar">
@@ -78,54 +79,126 @@
         </div>
         <p style="color: #64748b; margin-bottom: 20px;">Haz clic en cualquier elemento del sitio para editarlo</p>
         <div id="editor-form">
-            <p style="color: #94a3b8; text-align: center;">Selecciona un bloque para comenzar a editar</p>
+            <p style="color: #94a3b8; text-align: center;">Cargando...</p>
         </div>
     </div>
 </div>
 
 <script>
+    // Configuración - REEMPLAZA CON TUS DATOS
     const SUPABASE_URL = 'https://fwqojlaepsfbbbwwguwd.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3cW9qbGFlcHNmYmJid3dndXdkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNTYyNTcsImV4cCI6MjA5NDgzMjI1N30.sigAfGsDqhRSeOLDzSJxmMoyTwrWk1i7jHfwyuqmngU';
     const VERCEL_WEBHOOK = 'https://api.vercel.com/v1/integrations/deploy/prj_6FdpSljEMxSx1lGEEx2RyV0npaYg/HqroRrnwu2';
     
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Inicializar Supabase (solo una vez)
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
     let currentData = null;
     let selectedBlock = null;
     let selectedPath = null;
+    let isLoading = true;
     
     // Cargar el sitio y los datos
     async function loadSite() {
-        // Cargar datos de Supabase
-        const { data, error } = await supabase
-            .from('website_content')
-            .select('contenido')
-            .eq('id', 1)
-            .single();
-        
-        if (data && data.contenido) {
-            currentData = data.contenido;
-        } else {
-            // Datos por defecto
+        try {
+            document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            
+            // Cargar datos de Supabase
+            const { data, error } = await supabaseClient
+                .from('website_content')
+                .select('contenido')
+                .eq('id', 1)
+                .single();
+            
+            if (error) {
+                console.error('Error loading data:', error);
+                currentData = getDefaultData();
+            } else if (data && data.contenido) {
+                currentData = data.contenido;
+            } else {
+                currentData = getDefaultData();
+            }
+            
+            // Asegurar que existan arrays necesarios
+            if (!currentData.paquetes) currentData.paquetes = [];
+            if (!currentData.beneficios) currentData.beneficios = [];
+            if (!currentData.footer) currentData.footer = { copyright: "", columnas: [] };
+            if (!currentData.footer.columnas) currentData.footer.columnas = [];
+            
+            // Renderizar el sitio
+            renderSite();
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #10b981; font-size: 10px;"></i> Listo';
+            isLoading = false;
+            
+        } catch (err) {
+            console.error('Error:', err);
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #ef4444; font-size: 10px;"></i> Error al cargar';
             currentData = getDefaultData();
+            renderSite();
         }
-        
-        // Renderizar el sitio
-        renderSite();
     }
     
     function getDefaultData() {
         return {
-            header: { logoText: "marcela<br><span>correa</span> turismo", logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", whatsappNumber: "5493624331702" },
-            hero: { enabled: true, badge: "🌎 viajes de autor · cupos limitados", title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", subtitle: "Paquetes exclusivos con salidas garantizadas", backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", buttonPrimaryText: "Explorar paquetes", buttonSecondaryText: "Hablar por WhatsApp" },
-            paquetes: [],
+            header: { 
+                logoText: "marcela<br><span>correa</span> turismo", 
+                logoImage: "https://i.postimg.cc/4Nrd9zWM/logoturismo.jpg", 
+                whatsappNumber: "5493624331702" 
+            },
+            hero: { 
+                enabled: true, 
+                badge: "🌎 viajes de autor · cupos limitados", 
+                title: "Viajá con <span>Marcela Correa</span><br>y descubrí el mundo", 
+                subtitle: "Paquetes exclusivos con salidas garantizadas", 
+                backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800", 
+                buttonPrimaryText: "Explorar paquetes", 
+                buttonSecondaryText: "Hablar por WhatsApp" 
+            },
+            paquetes: [
+                {
+                    id: 1,
+                    nombre: "Buenos Aires Vip",
+                    precio: 199000,
+                    imagen: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3",
+                    badge: "Próxima salida",
+                    badgeColor: "#f15a24",
+                    descripcionCorta: "Salida 12 de Junio. Incluye excursiones a River, Boca, San Telmo, Luján.",
+                    incluye: ["Hotel 5 estrellas", "Desayunos", "City tour"]
+                },
+                {
+                    id: 2,
+                    nombre: "Mendoza & Nieve",
+                    precio: 280000,
+                    imagen: "https://images.unsplash.com/photo-1533105079780-92b9be482077",
+                    badge: "Cupos reducidos",
+                    badgeColor: "#00b48a",
+                    descripcionCorta: "Salidas 30 de Abril / 22 Mayo. Desayunos, guía local, traslados.",
+                    incluye: ["Bodegas", "Excursión a la nieve", "Desayunos"]
+                },
+                {
+                    id: 3,
+                    nombre: "Tafí + Termas",
+                    precio: 280000,
+                    imagen: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9",
+                    badge: "Todo incluido",
+                    badgeColor: "#520968",
+                    descripcionCorta: "2 noches, Termas de Río Hondo, visitas guiadas.",
+                    incluye: ["Termas incluidas", "Pensión completa", "Visitas guiadas"]
+                }
+            ],
             beneficios: [
                 { icono: "fa-crown", titulo: "Experiencias premium", descripcion: "Hoteles y buses de primera línea" },
                 { icono: "fa-clock", titulo: "Coordinación 24/7", descripcion: "Asistencia permanente en destino" },
                 { icono: "fa-credit-card", titulo: "Pago flexible", descripcion: "Tarjetas, efectivo, transferencia" },
                 { icono: "fa-map-pin", titulo: "Salidas garantizadas", descripcion: "Desde Resistencia, Corrientes y Villa Angela" }
             ],
-            footer: { copyright: "© 2026 Marcela Correa Turismo", columnas: [{ titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }] }] }
+            footer: { 
+                copyright: "© 2026 Marcela Correa Turismo", 
+                columnas: [
+                    { titulo: "MC Turismo", enlaces: [{ texto: "Quiénes somos", url: "#" }] },
+                    { titulo: "Contacto", enlaces: [{ texto: "WhatsApp", url: "https://wa.me/5493624331702" }] }
+                ] 
+            }
         };
     }
     
@@ -137,10 +210,12 @@
             <div class="card-paquete" data-editable="paquete" data-id="${p.id}">
                 <div class="card-img" style="background-image: url('${p.imagen}?w=500&h=260&fit=crop');"></div>
                 <div class="card-content">
-                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge}</div>
-                    <h3 class="card-title">${p.nombre}</h3>
-                    <div class="price">$${p.precio?.toLocaleString() || '0'} <small>pp</small></div>
-                    <div class="features">${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}</div>
+                    <div class="badge" style="background: ${p.badgeColor || '#f15a24'}">${p.badge || 'Destino'}</div>
+                    <h3 class="card-title">${p.nombre || 'Sin nombre'}</h3>
+                    <div class="price">$${(p.precio || 0).toLocaleString()} <small>pp</small></div>
+                    <div class="features">
+                        ${(p.incluye || []).slice(0,3).map(i => `<span><i class="fas fa-check-circle"></i> ${i}</span>`).join('')}
+                    </div>
                     <p>${p.descripcionCorta || ''}</p>
                     <div class="btn-card">Consultar ahora →</div>
                 </div>
@@ -149,16 +224,16 @@
         
         const beneficiosHTML = (currentData.beneficios || []).map((b, idx) => `
             <div class="benefit" data-editable="beneficio" data-idx="${idx}">
-                <i class="fas ${b.icono}"></i>
-                <h4>${b.titulo}</h4>
-                <p>${b.descripcion}</p>
+                <i class="fas ${b.icono || 'fa-star'}"></i>
+                <h4>${b.titulo || ''}</h4>
+                <p>${b.descripcion || ''}</p>
             </div>
         `).join('');
         
-        const footerColumnasHTML = (currentData.footer?.columnas || []).map((col, idx) => `
+        const footerColumnasHTML = (currentData.footer.columnas || []).map((col, idx) => `
             <div class="footer-col" data-editable="footer-col" data-idx="${idx}">
-                <h4>${col.titulo}</h4>
-                ${(col.enlaces || []).map(link => `<a href="${link.url}" target="_blank"><i class="${link.icono || ''}"></i> ${link.texto}</a>`).join('')}
+                <h4>${col.titulo || ''}</h4>
+                ${(col.enlaces || []).map(link => `<a href="${link.url || '#'}" target="_blank"><i class="${link.icono || ''}"></i> ${link.texto || ''}</a>`).join('')}
             </div>
         `).join('');
         
@@ -171,8 +246,8 @@
                 <header class="main-header">
                     <div class="container header-top">
                         <a href="#" class="logo">
-                            <div class="logo-icon"><img src="${currentData.header.logoImage}"></div>
-                            <div class="logo-text">${currentData.header.logoText}</div>
+                            <div class="logo-icon"><img src="${currentData.header.logoImage || ''}"></div>
+                            <div class="logo-text">${currentData.header.logoText || 'Marcela Correa'}</div>
                         </a>
                         <a href="${whatsappUrl}" class="btn-wa" target="_blank"><i class="fab fa-whatsapp"></i> Reservar</a>
                     </div>
@@ -180,14 +255,14 @@
                 
                 <!-- HERO -->
                 <div data-editable="hero">
-                    <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${currentData.hero.backgroundImage}'); background-size: cover;">
+                    <section class="hero" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('${currentData.hero.backgroundImage || ''}'); background-size: cover;">
                         <div class="container">
-                            <div class="hero-badge">${currentData.hero.badge}</div>
-                            <h1>${currentData.hero.title}</h1>
-                            <p>${currentData.hero.subtitle}</p>
+                            <div class="hero-badge">${currentData.hero.badge || ''}</div>
+                            <h1>${currentData.hero.title || 'Viajá con <span>Marcela Correa</span>'}</h1>
+                            <p>${currentData.hero.subtitle || ''}</p>
                             <div class="hero-buttons">
-                                <a href="#paquetes" class="btn-primary">${currentData.hero.buttonPrimaryText}</a>
-                                <a href="${whatsappUrl}" class="btn-outline">${currentData.hero.buttonSecondaryText}</a>
+                                <a href="#paquetes" class="btn-primary">${currentData.hero.buttonPrimaryText || 'Explorar'}</a>
+                                <a href="${whatsappUrl}" class="btn-outline">${currentData.hero.buttonSecondaryText || 'WhatsApp'}</a>
                             </div>
                         </div>
                     </section>
@@ -199,7 +274,7 @@
                         <h2 class="section-title">Próximas <span style="color: #f15a24;">salidas</span></h2>
                         <div class="section-sub">Elegí tu experiencia, nosotros nos encargamos del resto</div>
                         <div class="paquetes-grid">${paquetesHTML || '<p style="text-align:center">No hay paquetes. Agrega uno desde el editor.</p>'}</div>
-                        <button class="add-paquete-btn" onclick="window.addPaquete()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Paquete</button>
+                        <button class="add-paquete-btn" onclick="window.addPaquete && window.addPaquete()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Paquete</button>
                     </div>
                 </section>
                 
@@ -207,7 +282,7 @@
                 <section class="benefits">
                     <div class="container">
                         <div class="benefits-grid">${beneficiosHTML}</div>
-                        <button class="add-beneficio-btn" onclick="window.addBeneficio()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Beneficio</button>
+                        <button class="add-beneficio-btn" onclick="window.addBeneficio && window.addBeneficio()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 40px; margin-top: 30px; cursor: pointer; display: block; margin-left: auto; margin-right: auto;">+ Agregar Beneficio</button>
                     </div>
                 </section>
                 
@@ -215,7 +290,7 @@
                 <footer class="footer">
                     <div class="container">
                         <div class="footer-grid">${footerColumnasHTML}</div>
-                        <div class="footer-bottom"><p>${currentData.footer.copyright}</p></div>
+                        <div class="footer-bottom"><p>${currentData.footer.copyright || ''}</p></div>
                     </div>
                 </footer>
             </div>
@@ -318,32 +393,35 @@
             <h3 style="margin-bottom: 20px;"><i class="fas fa-film"></i> Editar Hero</h3>
             <div class="form-group">
                 <label>Badge</label>
-                <input type="text" id="hero-badge" value="${escapeHtml(currentData.hero.badge)}">
+                <input type="text" id="hero-badge" value="${escapeHtml(currentData.hero.badge || '')}">
             </div>
             <div class="form-group">
                 <label>Título (puede usar HTML)</label>
-                <textarea id="hero-title" rows="3">${escapeHtml(currentData.hero.title)}</textarea>
+                <textarea id="hero-title" rows="3">${escapeHtml(currentData.hero.title || '')}</textarea>
             </div>
             <div class="form-group">
                 <label>Subtítulo</label>
-                <textarea id="hero-subtitle" rows="2">${escapeHtml(currentData.hero.subtitle)}</textarea>
+                <textarea id="hero-subtitle" rows="2">${escapeHtml(currentData.hero.subtitle || '')}</textarea>
             </div>
             <div class="form-group">
                 <label>Imagen de fondo (URL)</label>
-                <input type="text" id="hero-image" value="${currentData.hero.backgroundImage}">
-                <div class="image-preview" style="background-image: url('${currentData.hero.backgroundImage}'); margin-top: 10px;"></div>
+                <input type="text" id="hero-image" value="${currentData.hero.backgroundImage || ''}">
+                <div class="image-preview" style="background-image: url('${currentData.hero.backgroundImage || ''}'); margin-top: 10px;"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary" value="${currentData.hero.buttonPrimaryText}"></div>
-                <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary" value="${currentData.hero.buttonSecondaryText}"></div>
+                <div class="form-group"><label>Botón principal</label><input type="text" id="hero-btn-primary" value="${escapeHtml(currentData.hero.buttonPrimaryText || '')}"></div>
+                <div class="form-group"><label>Botón secundario</label><input type="text" id="hero-btn-secondary" value="${escapeHtml(currentData.hero.buttonSecondaryText || '')}"></div>
             </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateHero()">Actualizar Hero</button>
+            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateHero()">Actualizar Hero</button>
         `;
         
         const imgInput = document.getElementById('hero-image');
-        imgInput.addEventListener('input', (e) => {
-            document.querySelector('.image-preview').style.backgroundImage = `url('${e.target.value}')`;
-        });
+        if (imgInput) {
+            imgInput.addEventListener('input', (e) => {
+                const preview = document.querySelector('.image-preview');
+                if (preview) preview.style.backgroundImage = `url('${e.target.value}')`;
+            });
+        }
     }
     
     function showBeneficioForm(idx) {
@@ -353,17 +431,17 @@
             <h3 style="margin-bottom: 20px;"><i class="fas fa-gem"></i> Editar Beneficio</h3>
             <div class="form-group">
                 <label>Icono (clase FontAwesome, ej: fa-crown)</label>
-                <input type="text" id="beneficio-icono" value="${b.icono}">
+                <input type="text" id="beneficio-icono" value="${b.icono || ''}">
             </div>
             <div class="form-group">
                 <label>Título</label>
-                <input type="text" id="beneficio-titulo" value="${escapeHtml(b.titulo)}">
+                <input type="text" id="beneficio-titulo" value="${escapeHtml(b.titulo || '')}">
             </div>
             <div class="form-group">
                 <label>Descripción</label>
-                <textarea id="beneficio-descripcion" rows="2">${escapeHtml(b.descripcion)}</textarea>
+                <textarea id="beneficio-descripcion" rows="2">${escapeHtml(b.descripcion || '')}</textarea>
             </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateBeneficio(${idx})">Actualizar Beneficio</button>
+            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateBeneficio(${idx})">Actualizar Beneficio</button>
             <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removeBeneficio(${idx})">Eliminar Beneficio</button>
         `;
     }
@@ -375,13 +453,13 @@
             <h3 style="margin-bottom: 20px;"><i class="fas fa-globe"></i> Editar Columna de Footer</h3>
             <div class="form-group">
                 <label>Título de la columna</label>
-                <input type="text" id="footer-titulo" value="${escapeHtml(col.titulo)}">
+                <input type="text" id="footer-titulo" value="${escapeHtml(col.titulo || '')}">
             </div>
             <div class="form-group">
                 <label>Enlaces (edita el JSON)</label>
-                <textarea id="footer-enlaces" rows="6">${JSON.stringify(col.enlaces, null, 2)}</textarea>
+                <textarea id="footer-enlaces" rows="6">${JSON.stringify(col.enlaces || [], null, 2)}</textarea>
             </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updateFooterCol(${idx})">Actualizar Columna</button>
+            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updateFooterCol(${idx})">Actualizar Columna</button>
         `;
     }
     
@@ -391,19 +469,19 @@
         
         const form = document.getElementById('editor-form');
         form.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-box"></i> Editar Paquete: ${p.nombre}</h3>
+            <h3 style="margin-bottom: 20px;"><i class="fas fa-box"></i> Editar Paquete: ${escapeHtml(p.nombre)}</h3>
             <div class="form-group">
                 <label>Nombre</label>
-                <input type="text" id="paquete-nombre" value="${escapeHtml(p.nombre)}">
+                <input type="text" id="paquete-nombre" value="${escapeHtml(p.nombre || '')}">
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Precio</label><input type="number" id="paquete-precio" value="${p.precio}"></div>
-                <div class="form-group"><label>Badge</label><input type="text" id="paquete-badge" value="${p.badge}"></div>
+                <div class="form-group"><label>Precio</label><input type="number" id="paquete-precio" value="${p.precio || 0}"></div>
+                <div class="form-group"><label>Badge</label><input type="text" id="paquete-badge" value="${escapeHtml(p.badge || '')}"></div>
             </div>
             <div class="form-group">
                 <label>Imagen (URL)</label>
-                <input type="text" id="paquete-imagen" value="${p.imagen}">
-                <div class="image-preview" style="background-image: url('${p.imagen}?w=300&h=180&fit=crop'); margin-top: 10px;"></div>
+                <input type="text" id="paquete-imagen" value="${p.imagen || ''}">
+                <div class="image-preview" style="background-image: url('${p.imagen || ''}?w=300&h=180&fit=crop'); margin-top: 10px;"></div>
             </div>
             <div class="form-group">
                 <label>Descripción corta</label>
@@ -413,14 +491,17 @@
                 <label>Incluye (separado por comas)</label>
                 <input type="text" id="paquete-incluye" value="${(p.incluye || []).join(', ')}">
             </div>
-            <button class="btn-save" style="width: 100%; margin-top: 10px;" onclick="updatePaquete(${id})">Actualizar Paquete</button>
+            <button class="btn-save" style="width: 100%; margin-top: 10px; background: #f15a24;" onclick="updatePaquete(${id})">Actualizar Paquete</button>
             <button class="btn-remove" style="width: 100%; margin-top: 10px; background: #ef4444;" onclick="removePaquete(${id})">Eliminar Paquete</button>
         `;
         
         const imgInput = document.getElementById('paquete-imagen');
-        imgInput.addEventListener('input', (e) => {
-            document.querySelector('.image-preview').style.backgroundImage = `url('${e.target.value}?w=300&h=180&fit=crop')`;
-        });
+        if (imgInput) {
+            imgInput.addEventListener('input', (e) => {
+                const preview = document.querySelector('.image-preview');
+                if (preview) preview.style.backgroundImage = `url('${e.target.value}?w=300&h=180&fit=crop')`;
+            });
+        }
     }
     
     function updateHero() {
@@ -454,12 +535,16 @@
     }
     
     function updateFooterCol(idx) {
-        currentData.footer.columnas[idx] = {
-            titulo: document.getElementById('footer-titulo').value,
-            enlaces: JSON.parse(document.getElementById('footer-enlaces').value)
-        };
-        renderSite();
-        document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+        try {
+            currentData.footer.columnas[idx] = {
+                titulo: document.getElementById('footer-titulo').value,
+                enlaces: JSON.parse(document.getElementById('footer-enlaces').value)
+            };
+            renderSite();
+            document.getElementById('status').innerHTML = '<i class="fas fa-circle" style="color: #f59e0b; font-size: 10px;"></i> Cambios sin guardar';
+        } catch(e) {
+            alert('Error al parsear JSON de enlaces');
+        }
     }
     
     function updatePaquete(id) {
@@ -516,7 +601,7 @@
     async function saveChanges() {
         document.getElementById('status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('website_content')
             .upsert({ id: 1, contenido: currentData, updated_at: new Date() });
         
@@ -556,9 +641,18 @@
         });
     }
     
+    // Exponer funciones globalmente
+    window.updateHero = updateHero;
+    window.updateBeneficio = updateBeneficio;
+    window.updateFooterCol = updateFooterCol;
+    window.updatePaquete = updatePaquete;
+    window.removeBeneficio = removeBeneficio;
+    window.removePaquete = removePaquete;
+    
     document.getElementById('btn-save').addEventListener('click', saveChanges);
     document.getElementById('btn-exit').addEventListener('click', exitEditor);
     
+    // Iniciar
     loadSite();
 </script>
 </body>
