@@ -1,0 +1,7 @@
+{
+  "name": "marcela-correa-turismo",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node generate-content.js"
+  }
+}
